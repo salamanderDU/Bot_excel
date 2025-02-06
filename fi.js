@@ -40,16 +40,19 @@
             error_log = 0;
             target_record = "-";
 
+
+            var codeDiff = [0,  1,  3,  4,  9, 18, 22, 24, 25, 26, 27];
+
             // ขอรับบริการในนาม 0
-            var sheet_request_service_on_behalf_of = targetGR.u_ขอร_บบร_การในนาม;
+            // var sheet_request_service_on_behalf_of = targetGR.u_ขอร_บบร_การในนาม;
             // ผู้ติดต่อ 1
-            var sheet_contact = targetGR.u_ผ__ต_ดต_อ;
+            // var sheet_contact = targetGR.u_ผ__ต_ดต_อ;
             // ผู้ขอรับบริการ 2
             var sheet_service_requester = targetGR.u_ผ__ขอร_บบร_การ.toString();
             // ประเภทเลขที่ยืนยันตัวตน 3
-            var sheet_type_identification_number = targetGR.u_ประเภทเลขท__ย_นย_นต_วตน;
+            // var sheet_type_identification_number = targetGR.u_ประเภทเลขท__ย_นย_นต_วตน;
             // ประเภทเลขที่ยืนยันตัวตน (นิติบุคคล) 4
-            var sheet_type_identification_number_juristic = targetGR.u_ประเภทเลขท___ตน__น_ต_บ_คคล_;
+            // var sheet_type_identification_number_juristic = targetGR.u_ประเภทเลขท___ตน__น_ต_บ_คคล_;
             // เลขที่ยืนยันตัวตน 5
             var sheet_identification_number = targetGR.u_เลขท__ย_นย_นต_วตน.toString();
             // เลขที่ยืนยันตัวตน (นิติบุคคล) 6
@@ -59,7 +62,8 @@
             // อีเมล 8
             var sheet_email = targetGR.u_อ_เมล.toString();
             // จังหวัด (ที่อยู่ลูกหนี้) 9
-            var sheet_province = targetGR.u_จ_งหว_ด__ท__อย__ล_กหน___;
+            // var sheet_province = targetGR.u_จ_งหว_ด__ท__อย__ล_กหน___;
+            var codeDiff = [0,  1,  3,  4,  9, 18, 22, 24, 25, 26, 27];
             // ชื่อนิติบุคคล 10
             var sheet_juristic_name = targetGR.u_ช__อน_ต_บ_คคล.toString();
             // ผู้ให้บริการ 11
@@ -79,7 +83,7 @@
             // เลขที่บัตร/ เลขที่สัญญา 17
             var sheet_contract_number = targetGR.u_เลขท__บ_ตร__เลขท__ส_ญญา.toString();
             // วันที่เริ่มติดต่อลูกหนี้  18
-            var sheet_date_of_start = targetGR.u_ว_นท__เร__มต_ดต_อล_กหน__;
+            // var sheet_date_of_start = targetGR.u_ว_นท__เร__มต_ดต_อล_กหน__;
             // ผลการพิจารณา 19
             var sheet_result = targetGR.u_ผลการพ_จารณา.toString();
             // แนวทางการช่วยเหลือลูกหนี้ 20
@@ -87,17 +91,18 @@
             // เหตุผลที่ไม่สามารถช่วยเหลือลูกหนี้ได้ 21
             var sheet_reason_not_help = targetGR.u_เหต_ผลท__ไม__หล_อล_กหน__ได_;
             // ภาระหนี้รวม (บาท) 22
-            var sheet_total_debt = targetGR.u_ภาระหน__รวม__บาท_;
+            // var sheet_total_debt = targetGR.u_ภาระหน__รวม__บาท_;
+            var codeDiff = [0,  1,  3,  4,  9, 18, 22, 24, 25, 26, 27];
             // เงินต้น (บาท) 23
             var sheet_principal = targetGR.u_เง_นต_น__บาท_;
             // ภาระหนี้ที่ตกลงชำระ (บาท) 24
-            var sheet_debt_agreed = targetGR.u_ภาระหน__ท__ตกลงชำระ__บาท_;
+            // var sheet_debt_agreed = targetGR.u_ภาระหน__ท__ตกลงชำระ__บาท_;
             // จำนวนงวดที่ชำระ (เดือน) 25
-            var sheet_no_payment = targetGR.u_จำนวนงวดท__ชำระ__เด_อน_.toString();
+            // var sheet_no_payment = targetGR.u_จำนวนงวดท__ชำระ__เด_อน_.toString();
             // ค่างวดต่อเดือน (บาท) 26
-            var sheet_monthly = targetGR.u_ค_างวดต_อเด_อน__บาท_;
+            // var sheet_monthly = targetGR.u_ค_างวดต_อเด_อน__บาท_;
             // รายงาน RDT 27
-            var sheet_rtd_report = targetGR.u_รายงาน_rdt;
+            // var sheet_rtd_report = targetGR.u_รายงาน_rdt;
             // วันที่ทำสัญญา 28
             var sheet_contract_date = targetGR.u_ว_นท__ทำส_ญญา;
             // ข้อมูลที่ต้องการแจ้ง ธปท. เพิ่มเติม (ถ้ามี) 29
@@ -119,7 +124,7 @@
                 sheet_reason_not_help = targetGR.u_เหต_ผลท__ไม__หล_อล_กหน__ได_.split("|")[0].trim();
             }
             // ตรววจสอบ format ข้อมูลวันที่
-            sheet_rtd_report = formatDate(sheet_rtd_report);
+            // sheet_rtd_report = formatDate(sheet_rtd_report);
 
 
             var casetaskGr = new GlideRecord('x_baot_debt_sett_0_debt_task');
@@ -129,19 +134,19 @@
             casetaskGr.u_show_on_ticket_list_page = true;
 
             // ขอรับบริการในนาม
-            if (sheet_request_service_on_behalf_of) {
-                casetaskGr.u_walkin_receive_service = sheet_request_service_on_behalf_of;
-            } else {
-                add_log(source.sys_import_set, row_count, target_record, "Error", "โปรดระบุ ขอรับบริการในนาม");
-                error_log = error_log + 1;
-            }
+            // if (sheet_request_service_on_behalf_of) {
+            //     casetaskGr.u_walkin_receive_service = sheet_request_service_on_behalf_of;
+            // } else {
+            //     add_log(source.sys_import_set, row_count, target_record, "Error", "โปรดระบุ ขอรับบริการในนาม");
+            //     error_log = error_log + 1;
+            // }
             // ผู้ติดต่อ
-            if (sheet_contact) {
-                casetaskGr.u_walkin_contact = sheet_contact; //new req
-            } else {
-                add_log(source.sys_import_set, row_count, target_record, "Error", "โปรดระบุ ผู้ติดต่อ");
-                error_log = error_log + 1;
-            }
+            // if (sheet_contact) {
+            //     casetaskGr.u_walkin_contact = sheet_contact; //new req
+            // } else {
+            //     add_log(source.sys_import_set, row_count, target_record, "Error", "โปรดระบุ ผู้ติดต่อ");
+            //     error_log = error_log + 1;
+            // }
             // ผู้ขอรับบริการ
             // validate ว่าเป็นชื่อหรือไม่ ได้ thai และ อังกฤษ และชื่อไม่เป็น number หรือค่าว่าง
             if (validateName(sheet_service_requester)) {
@@ -152,23 +157,23 @@
             }
             // ประเภทเลขที่ยืนยันตัวตน
             //sheet_type_identification_number ระบบให้เป็น เลขบัตรแล้ว 
-            if (sheet_type_identification_number) {
-                casetaskGr.u_walkin_type_identification_number = sheet_type_identification_number;
-            }
+            // if (sheet_type_identification_number) {
+            //     casetaskGr.u_walkin_type_identification_number = sheet_type_identification_number;
+            // }
 
             // ประเภทเลขที่ยืนยันตัวตน (นิติบุคคล)
-            if (sheet_type_identification_number_juristic) {
-                var typeIdentificationNumberJuristic = getRef("u_type_verify_iden", "u_verify_identify", sheet_type_identification_number_juristic);
-                if (typeIdentificationNumberJuristic == "Error") {
-                    add_log(source.sys_import_set, row_count, target_record, "Error", "ผิดพลาด ประเภทเลขที่ยืนยันตัวตน (นิติบุคคล)");
-                    error_log = error_log + 1;
-                } else {
-                    casetaskGr.u_walkin_type_identification_number_juristic = typeIdentificationNumberJuristic;
-                }
-            } else {
-                add_log(source.sys_import_set, row_count, target_record, "Error", "ผิดพลาด ประเภทเลขที่ยืนยันตัวตน (นิติบุคคล) ไม่มีข้อมูล");
-                error_log = error_log + 1;
-            }
+            // if (sheet_type_identification_number_juristic) {
+            //     var typeIdentificationNumberJuristic = getRef("u_type_verify_iden", "u_verify_identify", sheet_type_identification_number_juristic);
+            //     if (typeIdentificationNumberJuristic == "Error") {
+            //         add_log(source.sys_import_set, row_count, target_record, "Error", "ผิดพลาด ประเภทเลขที่ยืนยันตัวตน (นิติบุคคล)");
+            //         error_log = error_log + 1;
+            //     } else {
+            //         casetaskGr.u_walkin_type_identification_number_juristic = typeIdentificationNumberJuristic;
+            //     }
+            // } else {
+            //     add_log(source.sys_import_set, row_count, target_record, "Error", "ผิดพลาด ประเภทเลขที่ยืนยันตัวตน (นิติบุคคล) ไม่มีข้อมูล");
+            //     error_log = error_log + 1;
+            // }
             // เลขที่ยืนยันตัวตน
             // ไม่เป็น string หรือ ค่าว่าง | Error, รูปแบบข้อมูล "เลขที่ยืนย้นตัวตน" ไม่ถูกต้อง
             if (validateNumber(sheet_identification_number)) {
@@ -218,18 +223,18 @@
             }
 
             // จังหวัด (ที่อยู่ลูกหนี้)
-            if (sheet_province) {
-                var province = getRef("u_province", "u_name", sheet_province);
-                if (province == "Error") {
-                    add_log(source.sys_import_set, row_count, target_record, "Error", "ผิดพลาด จังหวัด (ที่อยู่ลูกหนี้)");
-                    error_log = error_log + 1;
-                } else {
-                    casetaskGr.u_province = province;
-                }
-            } else {
-                add_log(source.sys_import_set, row_count, target_record, "Error", "ผิดพลาด จังหวัด (ที่อยู่ลูกหนี้)");
-                error_log = error_log + 1;
-            }
+            // if (sheet_province) {
+            //     var province = getRef("u_province", "u_name", sheet_province);
+            //     if (province == "Error") {
+            //         add_log(source.sys_import_set, row_count, target_record, "Error", "ผิดพลาด จังหวัด (ที่อยู่ลูกหนี้)");
+            //         error_log = error_log + 1;
+            //     } else {
+            //         casetaskGr.u_province = province;
+            //     }
+            // } else {
+            //     add_log(source.sys_import_set, row_count, target_record, "Error", "ผิดพลาด จังหวัด (ที่อยู่ลูกหนี้)");
+            //     error_log = error_log + 1;
+            // }
             // ชื่อนิติบุคคล
             // มีค่าแต่ไม่เป็น String	Error, รูปแบบข้อมูล "ชื่อนิติบุคคล" ไม่ถูกต้อง
             // เป็น Empty แต่"เลขที่ยืนยันตัวตน (นิติบุคคล)" not empty	Error, โปรดระบุ "ชื่อนิติบุคคล" 
@@ -380,15 +385,15 @@
                 error_log = error_log + 1;
             }
             // วันที่เริ่มติดต่อลูกหนี้
-            if (check_datetime_valid(sheet_date_of_start)) {
-                casetaskGr.u_contact_debt = set_timezone_object(sheet_date_of_start);
-            } else if (sheet_date_of_start == "") {
-                add_log(source.sys_import_set, row_count, target_record, "Error", "ผิดพลาด วันที่เริ่มติดต่อลูกหนี้ไม่มีข้อมูล");
-                error_log = error_log + 1;
-            } else {
-                add_log(source.sys_import_set, row_count, target_record, "Error", "รูปแบบข้อมูล วันที่เริ่มติดต่อลูกหนี้ ไม่ถูกต้อง");
-                error_log = error_log + 1;
-            }
+            // if (check_datetime_valid(sheet_date_of_start)) {
+            //     casetaskGr.u_contact_debt = set_timezone_object(sheet_date_of_start);
+            // } else if (sheet_date_of_start == "") {
+            //     add_log(source.sys_import_set, row_count, target_record, "Error", "ผิดพลาด วันที่เริ่มติดต่อลูกหนี้ไม่มีข้อมูล");
+            //     error_log = error_log + 1;
+            // } else {
+            //     add_log(source.sys_import_set, row_count, target_record, "Error", "รูปแบบข้อมูล วันที่เริ่มติดต่อลูกหนี้ ไม่ถูกต้อง");
+            //     error_log = error_log + 1;
+            // }
 
             // ผลการพิจารณา ติดไว้ก่อน รอมัดรวมกับ state 
             //เป็น Empty	Error, โปรดระบุ "ผลการพิจารณา" 
@@ -466,16 +471,16 @@
 
             // ภาระหนี้รวม (บาท)
             // ข้อมูลที่ใส่มาต้องเป็นตัวเงินเท่านั้น
-            if (check_money_valid(sheet_total_debt)) {
-                casetaskGr.u_debt_burden = set_money_object(sheet_total_debt);
-            } else if (sheet_total_debt == "") {
-                add_log(source.sys_import_set, row_count, target_record, "Error", "โปรดระบุ ภาระหนี้รวม (บาท)");
-                error_log = error_log + 1;
-            } else {
-                add_log(source.sys_import_set, row_count, target_record, "Error", "รูปแบบข้อมูล ภาระหนี้รวม (บาท) ไม่ถูกต้อง");
-                error_log = error_log + 1;
+            // if (check_money_valid(sheet_total_debt)) {
+            //     casetaskGr.u_debt_burden = set_money_object(sheet_total_debt);
+            // } else if (sheet_total_debt == "") {
+            //     add_log(source.sys_import_set, row_count, target_record, "Error", "โปรดระบุ ภาระหนี้รวม (บาท)");
+            //     error_log = error_log + 1;
+            // } else {
+            //     add_log(source.sys_import_set, row_count, target_record, "Error", "รูปแบบข้อมูล ภาระหนี้รวม (บาท) ไม่ถูกต้อง");
+            //     error_log = error_log + 1;
 
-            }
+            // }
             // เงินต้น (บาท)
             // เป็น Empty	Error, โปรดระบุ "เงินต้น (บาท)" 
             // มีค่าแต่ไม่ถูก format เช่น -1 หรือ Error Cast String to Decimal	Error, รูปแบบข้อมูล "เงินต้น (บาท)"  ไม่ถูกต้อง
@@ -491,57 +496,57 @@
 
             // ภาระหนี้ที่ตกลงชำระ (บาท)
             // มีค่าแต่ไม่ถูก format เช่น -1 หรือ Error Cast String to Decimal	Error, รูปแบบข้อมูล ภาระหนี้ที่ตกลงชำระ ไม่ถูกต้อง
-            if (sheet_result == "ได้ข้อสรุปกับลูกค้า") {
-                if (check_money_valid(sheet_debt_agreed)) {
-                    casetaskGr.u_debt_confirm = set_money_object(sheet_debt_agreed);
-                } else if (sheet_debt_agreed == "") {
-                    //add code
-                    add_log(source.sys_import_set, row_count, target_record, "Error", "โปรดระบุ ภาระหนี้ที่ตกลงชำระ (บาท)");
-                    error_log = error_log + 1;
-                } else {
-                    add_log(source.sys_import_set, row_count, target_record, "Error", "รูปแบบข้อมูล ภาระหนี้ที่ตกลงชำระ (บาท) ไม่ถูกต้อง");
-                    error_log = error_log + 1;
+            // if (sheet_result == "ได้ข้อสรุปกับลูกค้า") {
+            //     if (check_money_valid(sheet_debt_agreed)) {
+            //         casetaskGr.u_debt_confirm = set_money_object(sheet_debt_agreed);
+            //     } else if (sheet_debt_agreed == "") {
+            //         //add code
+            //         add_log(source.sys_import_set, row_count, target_record, "Error", "โปรดระบุ ภาระหนี้ที่ตกลงชำระ (บาท)");
+            //         error_log = error_log + 1;
+            //     } else {
+            //         add_log(source.sys_import_set, row_count, target_record, "Error", "รูปแบบข้อมูล ภาระหนี้ที่ตกลงชำระ (บาท) ไม่ถูกต้อง");
+            //         error_log = error_log + 1;
 
-                }
-            }
+            //     }
+            // }
             // จำนวนงวดที่ชำระ (เดือน)
             // ถ้าผลการพิจารณาเป็น ได้ข้อสรุปกับลูกค้า จำนวนงวดที่ต้องชำระ ห้ามเป็นค่าว่าง
             // ข้อมูลที่ใส่มาต้องเป็นตัวเลขจำนวนเต็มบวกเท่านั้น
-            if (sheet_result == "ได้ข้อสรุปกับลูกค้า") {
-                if (sheet_no_payment == "") {
-                    add_log(source.sys_import_set, row_count, target_record, "Error", "โปรดระบุ จำนวนงวดที่ต้องชำระ (เดือน)");
-                    error_log = error_log + 1;
-                } else if (validateNumber(sheet_no_payment)) {
-                    casetaskGr.u_installment = parseInt(sheet_no_payment);
-                } else {
-                    add_log(source.sys_import_set, row_count, target_record, "Error", "รูปแบบ จำนวนงวดที่ชำระ (เดือน) ไม่ถูกต้อง");
-                    error_log = error_log + 1;
-                }
-            }
+            // if (sheet_result == "ได้ข้อสรุปกับลูกค้า") {
+            //     if (sheet_no_payment == "") {
+            //         add_log(source.sys_import_set, row_count, target_record, "Error", "โปรดระบุ จำนวนงวดที่ต้องชำระ (เดือน)");
+            //         error_log = error_log + 1;
+            //     } else if (validateNumber(sheet_no_payment)) {
+            //         casetaskGr.u_installment = parseInt(sheet_no_payment);
+            //     } else {
+            //         add_log(source.sys_import_set, row_count, target_record, "Error", "รูปแบบ จำนวนงวดที่ชำระ (เดือน) ไม่ถูกต้อง");
+            //         error_log = error_log + 1;
+            //     }
+            // }
 
             // ค่างวดต่อเดือน (บาท)
             // ถ้าผลการพิจารณาเป็น ได้ข้อสรุปกับลูกค้า ค่างวดต่อเดือน ห้ามเป็นค่าว่าง
             // ข้อมูลที่ใส่มาต้องเป็นตัวเงินเท่านั้น
-            if (sheet_result == "ได้ข้อสรุปกับลูกค้า") {
-                if (check_money_valid(sheet_monthly)) {
-                    casetaskGr.u_amount_month = set_money_object(sheet_monthly);
-                } else if (sheet_monthly == "") {
-                    add_log(source.sys_import_set, row_count, target_record, "Error", "โปรดระบุ ค่างวดต่อเดือน (บาท)");
-                    error_log = error_log + 1;
-                } else {
-                    add_log(source.sys_import_set, row_count, target_record, "Error", "ผิดพลาด ค่างวดต่อเดือน (บาท)");
-                    error_log = error_log + 1;
-                }
-            }
+            // if (sheet_result == "ได้ข้อสรุปกับลูกค้า") {
+            //     if (check_money_valid(sheet_monthly)) {
+            //         casetaskGr.u_amount_month = set_money_object(sheet_monthly);
+            //     } else if (sheet_monthly == "") {
+            //         add_log(source.sys_import_set, row_count, target_record, "Error", "โปรดระบุ ค่างวดต่อเดือน (บาท)");
+            //         error_log = error_log + 1;
+            //     } else {
+            //         add_log(source.sys_import_set, row_count, target_record, "Error", "ผิดพลาด ค่างวดต่อเดือน (บาท)");
+            //         error_log = error_log + 1;
+            //     }
+            // }
             // รายงาน RDT
-            if (check_date_valid(sheet_rtd_report)) {
-                casetaskGr.u_rdt = set_date_object(sheet_rtd_report);
-            } else if (sheet_rtd_report == "") {
-                //add code
-            } else {
-                add_log(source.sys_import_set, row_count, target_record, "Error", "รูปแบบข้อมูล วันที่ทำสัญญา  ไม่ถูกต้อง โปรดระบุใน format DD-MM-YYYY");
-                error_log = error_log + 1;
-            }
+            // if (check_date_valid(sheet_rtd_report)) {
+            //     casetaskGr.u_rdt = set_date_object(sheet_rtd_report);
+            // } else if (sheet_rtd_report == "") {
+            //     //add code
+            // } else {
+            //     add_log(source.sys_import_set, row_count, target_record, "Error", "รูปแบบข้อมูล วันที่ทำสัญญา  ไม่ถูกต้อง โปรดระบุใน format DD-MM-YYYY");
+            //     error_log = error_log + 1;
+            // }
             // วันที่ทำสัญญา
             // มีค่าแต่ไม่ถูก Error Cast String to Date	Error, รูปแบบข้อมูล "วันที่ทำสัญญา"  ไม่ถูกต้อง โปรดระบุใน format DD-MM-YYYY
             if (check_date_valid(sheet_contract_date)) {

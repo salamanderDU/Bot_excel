@@ -12,12 +12,10 @@
 		var row_count = 0;
 		var error_log = 0;
 		var error_log_all = 0;
-		var target_record = "-";
+		var target_record = "";
 		var userSysId_uploadby = "";
 		var debt_project;
 		var countNumber = 1;
-		
-		
 		// update ข้อมูลด้วยตนเอง
 		var carProduct = ["สินเชื่อเช่าซื้อรถยนต์ / Top-up / รถแลกเงินแบบโอนเล่ม", "สินเชื่อเช่าซื้อรถจักรยานยนต์ / Top-up / รถแลกเงินโอนเล่ม", "จำนำทะเบียนรถยนต์ (ไม่โอนเล่ม)", "จำนำทะเบียนรถจักรยานยนต์ (ไม่โอนเล่ม)","สินเชื่อเช่าซื้อรถยนต์", "สินเชื่อเช่าซื้อรถจักรยานยนต์", "สินเชื่อจำนำทะเบียนรถยนต์", "สินเชื่อจำนำทะเบียนรถจักรยานยนต์"];
 
@@ -28,17 +26,11 @@
 		grSA.orderByDesc("sys_created_on");
 		grSA.query();
 		if (grSA.next()) {
-		
-		// var gr1 = new GlideRecord('sys_attachment');
-		// gr1.addQuery('table_name', 'x_baot_debt_sett_0_import_excel_attachments');
-		// gr1.orderByDesc('sys_created_on');
-		// gr1.query();
-		// if (gr1.next()) {
-			
+
 			var sysid_table_importattachment1 = grSA.getValue("file_name").split("-")[0];
 
 			gs.info("sysid_table_importattachment1: "+grSA.getValue("file_name").split("-")[0]);
-
+            
 			var row_table_importattachment1 = new GlideRecord('x_baot_debt_sett_0_import_excel_attachments');
 			row_table_importattachment1.addQuery('sys_id', sysid_table_importattachment1);
 			row_table_importattachment1.query();
@@ -46,28 +38,8 @@
 				userSysId_uploadby = row_table_importattachment1.upload_by;
 				importExcelAttachmentSysId = row_table_importattachment1.sys_id;
 			}
-		// }
 
 		}
-
-		gs.info("userSysId_uploadby: "+userSysId_uploadby);
-		gs.info("importExcelAttachmentSysId: "+importExcelAttachmentSysId);
-
-		// gs.info("duke"+JSON.stringify(source));
-		// //new get userSysId_uploadby
-		// var grIM = new GlideRecord("x_baot_debt_sett_0_import_excel_attachments");
-		// importExcel = source.sys_import_set;
-		// gs.info("[Excel Bulk Upload importExcel]importExcel :"+importExcel);
-		// grIM.addQuery("importset_link", importExcel);
-		// grIM.query();
-		// // gs.info(JSON.stringify(grIM));
-		// if(grIM.next()){
-		// 	gs.info("userSysId_uploadby = "+grIM.upload_by);
-		// 	userSysId_uploadby = grIM.upload_by;
-		// }else{
-		// 	gs.info("[Excel Bulk Uplaod] not in");
-		// }
-
 
 		gs.info("[Excel Bulk Uplaod]get user: "+userSysId_uploadby);
 
@@ -96,12 +68,8 @@
 						row_table_importattachment.u_file_error = 'ไฟล์ที่แนบมีข้อมูลไม่ถูกต้อง';
 					}
 					row_table_importattachment.update();
-
 				}
 			}
-
-
-			//error_log = error_log + 1;
 		} else {
 			while (targetGR.next()) {
 				row_count += 1;
@@ -111,13 +79,10 @@
 
 				// หมายเลข Case Task
 				var sheet_case_task_id = targetGR.u_หมายเลข_case_task;
-
-				// 
+				// case ที่เกี่ยวข้อง
 				var sheet_case_relate = targetGR.u_case_ท__เก__ยวข_อง;
-
 				//case detail
 				var sheet_case_detail = targetGR.u_หมายเลข_detail;
-
 				// เรื่อง
 				var sheet_title = targetGR.u_เร__อง;
 				// สถานะการดำเนินงาน
@@ -159,27 +124,22 @@
 
 				var sheet_product = targetGR.u_ผล_ตภ_ณฑ_;
 				if (sheet_product == '' || sheet_product == null) {
-					//    gs.info('sheet_guidelines_debtorssssssssssssllllllllllds');
+					// do nothing
 
 				} else {
 					sheet_product = targetGR.u_ผล_ตภ_ณฑ_.split("|")[0].trim();
-
 				}
-				gs.info("V3Log_เรื่อง : " + sheet_title + " product : " + sheet_product);
 
 				var sheet_account_status = targetGR.u_สถานะบ_ญช_;
 				if (sheet_account_status == '' || sheet_account_status == null) {
-					//    gs.info('sheet_guidelines_debtorssssssssssssllllllllllds');
-
+					// do nothing
 				} else {
 					sheet_account_status = targetGR.u_สถานะบ_ญช_.split("|")[0].trim();
 
 				}
-				//  gs.info('sheet_guidelines_debtorssssssssseeeeeeeeeeeeeeeedlds');
 
 				//โครงการแก้หนี้
 				var sheet_project_debt = targetGR.u_โครงการแก_หน__;
-
 				// เลขที่ทะเบียนรถ
 				var sheet_vehicle_number = targetGR.u_เลขท__ทะเบ_ยนรถ;
 				// จังหวัดที่จดทะเบียนรถ
@@ -201,18 +161,15 @@
 				// แนวทางการช่วยเหลือลูกหนี้
 				var sheet_guidelines_debtors = targetGR.u_แนวทางการช_วยเหล_อล_กหน__;
 				if (sheet_guidelines_debtors == '' || sheet_guidelines_debtors == null) {
-					//gs.info('sheet_guidelines_debtorssssssssssssllllllllllds');
+					// do nothing
 				} else {
-					//  gs.info('sheet_guidelines_debtorssssssssseeeeeeeeeeeeeeeedlds');
 					sheet_guidelines_debtors = targetGR.u_แนวทางการช_วยเหล_อล_กหน__.split("|")[0].trim();
 				}
 
 				var sheet_reason_not_help = targetGR.u_เหต_ผลท__ไม__หล_อล_กหน__ได_;
 				if (sheet_reason_not_help == '' || sheet_guidelines_debtors == null) {
-					//    gs.info('sheet_guidelines_debtorssssssssssssllllllllllds');
-
+                    // do nothing
 				} else {
-					//  gs.info('sheet_guidelines_debtorssssssssseeeeeeeeeeeeeeeedlds');
 					sheet_reason_not_help = targetGR.u_เหต_ผลท__ไม__หล_อล_กหน__ได_.split("|")[0].trim();
 				}
 
@@ -265,7 +222,6 @@
 							} else if (casetaskGr.state == 3 || casetaskGr.state == 6) {
 								// 3 == Closed && 6 == Resolved && 7 == Cancelled
 								// รายงาน RDT
-
 								if (sheet_rtd_report) {
 									sheet_rtd_report = formatDate(sheet_rtd_report);
 									if (check_date_valid(sheet_rtd_report)) {
@@ -275,7 +231,6 @@
 										error_log = error_log + 1;
 									}
 								}
-
 
 								// รายงาน DRD
 								if (sheet_drd_report) {
@@ -300,7 +255,6 @@
 								}
 								continue;
 							} else {
-
 
 								// ผู้รับมอบหมาย
 								casetaskGr.u_bulk_upload = false;
@@ -350,8 +304,7 @@
 
 								//สถานะบัญชี
 								if (sheet_account_status == "" && sheet_state == "Cancelled") {
-									///
-
+									// do nothing
 								} else if (check_select_valid_activePipe('x_baot_debt_sett_0_debt_to_fair', "u_m2m_debt_status_to_application.u_debt_statusSTARTSWITH" + sheet_account_status + "^x_baot_debt_sett_0_debt_fair.short_description=" + debt_project)) {
 									var state_debt = get_select_valid_active('u_m2m_debt_status_to_application', 'u_debt_status.u_name', sheet_account_status);
 									if (state_debt == "Error") {
@@ -376,8 +329,7 @@
 									} else if (sheet_vehicle_number != "") {
 										casetaskGr.u_number_car = sheet_vehicle_number;
 									} else {
-										// add_log(source.sys_import_set, row_count, target_record, "Error", "ผิดพลาด เลขที่ทะเบียนรถ");
-										// error_log = error_log + 1;
+										// do nothing
 									}
 								}
 
@@ -396,8 +348,7 @@
 											casetaskGr.u_province_car = province_car;
 										}
 									} else {
-										// add_log(source.sys_import_set, row_count, target_record, "Error", "ผิดพลาด จังหวัดที่จดทะเบียนรถ");
-										// error_log = error_log + 1;
+										// do nothing
 
 									}
 								}
@@ -786,13 +737,10 @@
 				else if (sheet_case_ref != "") {
 
 					var caseref;
-
 					var casedebtGr = new GlideRecord('x_baot_debt_sett_0_ect_debt_settlement');
-					//casedebtGr.addQuery('sys_id', caseref);
 					if (casedebtGr.get(get_user_valid_active('x_baot_debt_sett_0_ect_debt_settlement', 'number', sheet_case_ref))) {
 						caseref = casedebtGr.parent;
 					}
-
 
 					var caseGr = new GlideRecord('x_baot_debt_sett_0_case');
 					caseGr.addQuery('sys_id', caseref);
@@ -997,9 +945,6 @@
 
 							}
 
-						// Ref Case Task
-						// 
-
 						// เลขที่บัตร/ เลขที่สัญญา
 						if (sheet_contract_number != "") {
 							casetaskGr.u_number_contact = sheet_contract_number;
@@ -1054,19 +999,6 @@
 						}
 						else if(sheet_state == "New" || sheet_state == "Open"){
 							// value New:1, Open:10
-							// if (sheet_result != "") {
-							// 	error_log = error_log + 1;
-							// 	add_log(source.sys_import_set, row_count, target_record, "Error", "ผิดพลาด ผลการพิจารณาไม่สอดคล้องกับสถานะ");
-							// }
-
-							// var intt = get_select_state_active(sheet_state);
-							// if (intt == "1" || intt == 1) {
-                            //     casetaskGr.state = 1;
-                            //     casetaskGr.u_work_state = "รอเจ้าหน้าที่เข้ามารับงาน";
-                            // } else if(intt == "10" || intt == 10){
-							// 	casetaskGr.state = 10;
-                            //     casetaskGr.u_work_state = "รอเจ้าหน้าที่เข้ามารับงาน";
-							// }
 
 							add_log(source.sys_import_set, row_count, target_record, "Error", "สถานะใบงานไม่สามารถเป็น New หรือ Open ");
 							error_log = error_log + 1;
@@ -1295,19 +1227,14 @@
 							gr.query();
 							var rowCountNumber = gr.getRowCount() + countNumber;
 
-							// gs.info('rowCount' + rowCount);
 
 							var type = 'casetask';
 							var recordNumber = new global.MF_ChildRecordNumberPadding().padNumber(rowCountNumber, parentNumber, type);
-							// source.u_หมายเลข_case_task = recordNumber;
 							gs.info('recordNumber' + recordNumber);
-							// source.update();
 
-							// countNumber++;
 							casetaskGr.number = recordNumber;
 							casetaskGr.insert();
 
-							// test(targetGR, recordNumber);
 							var case_number = recordNumber;
 							add_log(source.sys_import_set, row_count, case_number, "Insert","เพิ่มข้อมูลสำเร็จ");
 						} else {
@@ -1352,38 +1279,10 @@
 			log_error_total = erorrGrRecord.getRowCount();
 		}
 
-
-		// Update Import Set Ref in Import Attachment Table
-
-
-		//importExcelAttachmentSysId มืออยู่แล้ว
-
-
-
-		// gs.info("[Excel Bulk Upload]source.sys_import: "+source.sys_import_set.data_source.sys_id);
-		// var gr = new GlideRecord('sys_attachment');
-		// gr.addQuery('table_name', 'sys_data_source');
-		// gr.addQuery('table_sys_id', source.sys_import_set.data_source.sys_id);
-		// gr.orderByDesc('sys_created_on');
-		// gr.query();
-		// if (gr.next()) {
-			// Update Import Set in Table Import Attachment
-			// var sysid_table_importattachment = gr.getValue("file_name").split("-")[0]; // ไม่ต้องใช้เพราะว่าประกาศไว้แล้วข้างบนคือ importExcelAttachmentSysId
-
-
 			var row_table_importattachment = new GlideRecord('x_baot_debt_sett_0_import_excel_attachments');
 			row_table_importattachment.addQuery("sys_id", importExcelAttachmentSysId);
 			row_table_importattachment.query();
 			if (row_table_importattachment.next()) {
-				// find Import Set
-
-				// var row_importset = new GlideRecord('sys_import_set');
-				// row_importset.addQuery("sys_id", import_set.sys_id);
-				// row_importset.query();
-				// if (row_importset.next()) {
-
-					// gs.info("[Excel Bulk Upload] Import Set add(sys_import_set): " + import_set.sys_id + " | " + row_importset.sys_id+" | "+ source.sys_import_set);
-					// gs.info("[Excel Bulk Upload] importsetLink "+row_importset.sys_id);
 
 					row_table_importattachment.setValue("importset_link", source.sys_import_set);
 					// gs.info("row_table_importattachment : " + row_table_importattachment);
@@ -1406,16 +1305,9 @@
 					row_table_importattachment.load_runtime = new GlideDuration(durationsmilli);
 					row_table_importattachment.update();
 
-				// } else {
-				// 	gs.info("[Excel Bulk Upload] Import Set not found for sys_id(sys_import_set): " + import_set.sys_id);
-				// 	row_table_importattachment.setValue("state", "5");
-				// }
-
 			} else { 
-				// ตัวนี้ต้องมี
 				gs.info("[Excel Bulk Upload] Record row_table_importattachment not found!");
 			}
-		// } //ของ sys attachment
 
 
 
