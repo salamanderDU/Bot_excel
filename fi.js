@@ -405,11 +405,8 @@
 						error_log = error_log + 1;
 					} else {
 						casetaskGr.u_glideline_debt = glideline_debt;
-						// resolved
 						var resolution_code = get_active_result(sheet_result);
 						casetaskGr.u_resolution_code = resolution_code;
-						// casetaskGr.state = 6; // Resolved
-						// casetaskGr.u_work_state = "เจ้าหน้าที่ดำเนินการเสร็จสิ้น";
 						casetaskGr.state = 3; // Close
 						casetaskGr.u_work_state = "ดำเนินการเสร็จสิ้น";
 						casetaskGr.close_notes = sheet_additional_info;
@@ -431,11 +428,8 @@
 						error_log = error_log + 1;
 					} else {
 						casetaskGr.u_reason_unable_help = reason_unable_help;
-						// resolved
 						var resolution_code = get_active_result(sheet_result);
 						casetaskGr.u_resolution_code = resolution_code;
-						// casetaskGr.state = 6; // Resolved
-						// casetaskGr.u_work_state = "เจ้าหน้าที่ดำเนินการเสร็จสิ้น";
 						casetaskGr.state = 3; // Close
 						casetaskGr.u_work_state = "ดำเนินการเสร็จสิ้น";
 						casetaskGr.close_notes = sheet_additional_info;
@@ -941,3 +935,48 @@ function getRefProvider(sheet_provider) {
 		return "Error";
 	}
 }
+
+// calculate not in template
+casetaskGr.u_bulk_upload = true;
+// calculate not in template
+casetaskGr.short_description = "แก้หนี้ - โครงการคุณสู้ เราช่วย -  " + sheet_product + " [" + providerName.u_name + "]";
+// calculate not in template
+casetaskGr.u_show_on_ticket_list_page = true;
+casetaskGr.u_walk_service_requester = sheet_service_requester;
+casetaskGr.u_walkin_identification_number = sheet_identification_number;
+// calculate not in template
+casetaskGr.u_walkin_receive_service = "1";
+casetaskGr.u_walkin_phone = sheet_phone;
+casetaskGr.u_walkin_email = sheet_email;
+casetaskGr.u_walkin_juristic_name = sheet_juristic_name;
+casetaskGr.u_identification_number_juristic = sheet_identification_number_juristic;
+casetaskGr.u_provider = provider;
+// calculate not in template
+casetaskGr.assignment_group = providerSupportGroup;
+// calculate not in template
+casetaskGr.sys_created_by = userName_uploadby;
+// calculate not in template
+casetaskGr.assigned_to = userSysId_uploadby;
+casetaskGr.u_product = product;
+casetaskGr.u_state_debt = state_debt;
+// calculate not in template
+casetaskGr.u_debt_project = "d343d5cb1bedc6506c24dcace54bcb85";
+casetaskGr.u_number_car = sheet_vehicle_number;
+casetaskGr.u_province_car = province_car;
+casetaskGr.u_offer_provider = glideline_provider;
+casetaskGr.u_number_contact = sheet_contract_number;
+casetaskGr.u_glideline_debt = glideline_debt;
+casetaskGr.u_resolution_code = resolution_code;
+// calculate not in template
+casetaskGr.state = 3;
+// calculate not in template
+casetaskGr.u_work_state = "ดำเนินการเสร็จสิ้น";
+casetaskGr.close_notes = sheet_additional_info;
+casetaskGr.u_reason_unable_help = reason_unable_help;
+casetaskGr.u_principle = set_money_object(sheet_principal);
+casetaskGr.u_drd = set_date_object(sheet_contract_date);
+casetaskGr.opened_at = set_date_object(sheet_take_request);
+
+var casetaskGrFiled = ["u_bulk_upload", "short_description", "u_show_on_ticket_list_page", "u_walk_service_requester", "u_walkin_identification_number", "u_walkin_receive_service", "u_walkin_phone", "u_walkin_email", "u_walkin_juristic_name", "u_identification_number_juristic", "u_provider", "assignment_group", "sys_created_by", "assigned_to", "u_product", "u_state_debt", "u_debt_project", "u_number_car", "u_province_car", "u_offer_provider", "u_number_contact", "u_glideline_debt", "u_resolution_code", "state", "u_work_state", "close_notes", "u_reason_unable_help", "u_principle", "u_drd", "opened_at"];
+// casetaskGrFiled.length = 30
+var casetaskGrFiled_notCalculate = ["u_walk_service_requester", "u_walkin_identification_number", "u_walkin_phone", "u_walkin_email", "u_walkin_juristic_name", "u_identification_number_juristic", "u_provider", "u_product", "u_state_debt", "u_offer_provider", "u_number_contact", "u_glideline_debt", "u_resolution_code", "close_notes", "u_reason_unable_help", "u_principle", "u_drd", "opened_at"];
