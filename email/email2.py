@@ -29,7 +29,7 @@ END:VCALENDAR
 """
     return ics_content
 
-def send_email_with_attachment(smtp_server, port, sender_email,recipient_email, subject, body, attachment):
+def send_email_with_attachment(smtp_server, port, sender_email, recipient_email, subject, body, attachment):
     """Send an email with an ICS attachment."""
     try:
         # Create a multipart message
@@ -37,23 +37,22 @@ def send_email_with_attachment(smtp_server, port, sender_email,recipient_email, 
         msg['From'] = sender_email
         msg['To'] = recipient_email
         msg['Subject'] = subject
-        # Attach the email body
 
+        # Attach the email body
         msg.attach(MIMEText(body, 'plain'))
 
         # Attach the ICS file
-        part = MIMEBase('application', 'octet-stream')
+        part = MIMEBase('text', 'calendar', method='REQUEST', name='event.ics')
         part.set_payload(attachment)
         encoders.encode_base64(part)
-        part.add_header('Content-Disposition',
-                        f'attachment; filename="event.ics"')
+        part.add_header('Content-Disposition', 'attachment; filename="event.ics"')
+        part.add_header('Content-Class', 'urn:content-classes:calendarmessage')
         msg.attach(part)
 
         # Create an SMTP session and send the email
         with smtplib.SMTP(smtp_server, port) as server:
             server.set_debuglevel(1)
-            response = server.sendmail(sender_email, recipient_email, msg.as_string())
-            print("Response: "+str(response))
+            server.sendmail(sender_email, recipient_email, msg.as_string())
             print("Email sent successfully with calendar event!")
 
     except Exception as e:
@@ -61,10 +60,10 @@ def send_email_with_attachment(smtp_server, port, sender_email,recipient_email, 
 
 if __name__ == "__main__":
     SMTP_SERVER = 'mailgateway1.bot.or.th'  # Replace with your SMTP server
-    PORT = 25                         # For TLS
+    PORT = 25  # For TLS
     SENDER_EMAIL = 'services@bot.or.th'  # Replace with your email
     RECIPIENT_EMAIL = 'suphakit_k@mfec.co.th'
-    SUBJECT = 'Upcoming Event Notification'    # Subject of the email
+    SUBJECT = 'Upcoming Event Notification'  # Subject of the email
     BODY = 'Please find the attached calendar event.\n\nBest regards,'  # Body of the email
 
     event_details = {
@@ -73,9 +72,9 @@ if __name__ == "__main__":
         'location': 'Online',
         'description': 'Monthly team meeting to discuss project updates.',
         'start': datetime.datetime(2025, 1, 31, 10, 0),  # Start time
-        'end': datetime.datetime(2025, 1, 31, 11, 0)     # End time
+        'end': datetime.datetime(2025, 1, 31, 11, 0)  # End time
     }
 
     ics_content = create_ics(event_details)
 
-    send_email_with_attachment(SMTP_SERVER, PORT, SENDER_EMAIL,RECIPIENT_EMAIL, SUBJECT, BODY, ics_content)
+    send_email_with_attachment(SMTP_SERVER, PORT, SENDER_EMAIL, RECIPIENT_EMAIL, SUBJECT, BODY, ics_content)
