@@ -179,20 +179,16 @@
 					//  gs.info('sheet_guidelines_debtorssssssssseeeeeeeeeeeeeeeedlds');
 					sheet_reason_not_help = targetGR.u_เหต_ผลท__ไม__หล_อล_กหน__ได_.split("|")[0].trim();
 				}
-				// ภาระหนี้รวม (บาท)
+
 				var sheet_total_debt = targetGR.u_ภาระหน__รวม__บาท_;
-				var value_sheet_total_debt = setNumber(sheet_total_debt);
 				// เงินต้น (บาท)
 				var sheet_principal = targetGR.u_เง_นต_น__บาท_;
-				var value_sheet_principal = setNumber(sheet_principal);
 				// ภาระหนี้ที่ตกลงชำระ (บาท)
 				var sheet_debt_agreed = targetGR.u_ภาระหน__ท__ตกลงชำระ__บาท_;
-				var value_sheet_debt_agreed = setNumber(sheet_debt_agreed);
 				// จำนวนงวดที่ชำระ (เดือน)
 				var sheet_no_payment = targetGR.u_จำนวนงวดท__ชำระ__เด_อน_;
 				// ค่างวดต่อเดือน (บาท)
 				var sheet_monthly = targetGR.u_ค_างวดต_อเด_อน__บาท_;
-				var value_sheet_monthly = setNumber(sheet_monthly);
 				// รายงาน RDT
 				var sheet_rdt_report = targetGR.u_รายงาน_rdt;
 				// รายงาน DRD
@@ -478,7 +474,7 @@
 										add_log(source.sys_import_set, row_count, target_record, "Error", "ผิดพลาด สถานะใบงานไม่สามารถเป็น Resolved เนื่องจากผลการพิจารณาว่าง");
 										error_log = error_log + 1;
 									} else if ((sheet_product == '' || sheet_account_status == '' || sheet_contract_number == '' || sheet_total_debt == '' || sheet_principal == '') && (debt_project == "ทางด่วนแก้หนี้")) {
-										// ผลิตภัณฑ์, สถานะบัญชี, เลขที่บัตร/ เลขที่สัญญา, ภาระหนี้รวม (บาท), เงินต้น (บาท)
+										// ผลิตภัณฑ์, สถานะบัญชี, เลขที่บัตร/ เลขที่สัญญา, ภาระหนี้รวม, เงินต้น
 										add_log(source.sys_import_set, row_count, target_record, "Error", "ผิดพลาด สถานะใบงานไม่สามารถเป็น Resolved เนื่องจากมี Mandatory Field ว่าง");
 										error_log = error_log + 1;
 									} else if ((sheet_product == '' || sheet_account_status == '' || sheet_contract_number == '' || sheet_principal == '') && (debt_project == "โครงการคุณสู้ เราช่วย")) {
@@ -615,22 +611,16 @@
 								}
 
 								// ภาระหนี้รวม (บาท) validation rule
-								if (check_money_valid(sheet_total_debt) && value_sheet_total_debt > 0) {
+								if (check_money_valid(sheet_total_debt)) {
 									casetaskGr.u_debt_burden = set_money_object(sheet_total_debt);
 								} else {
 									if (debt_project == "ทางด่วนแก้หนี้") {
 										if (sheet_total_debt == "" && (sheet_state == "New" || sheet_state == "Cancelled")) {
 											//do nothing
-										} 
-										else if (sheet_total_debt == "") {
+										} else if (sheet_total_debt == "") {
 											add_log(source.sys_import_set, row_count, target_record, "Error", 'โปรดระบุ "ภาระหนี้รวม (บาท)"');
 											error_log = error_log + 1;
-										} 
-										else if (value_sheet_total_debt <= 0) {
-											add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "ภาระหนี้รวม (บาท)"  ต้องมากกว่า 0');
-											error_log = error_log + 1;
-										}
-										else {
+										} else {
 											add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "ภาระหนี้รวม (บาท)" ไม่ถูกต้อง');
 											error_log = error_log + 1;
 										}
@@ -646,21 +636,14 @@
 								}
 
 								// เงินต้น (บาท)
-								if (check_money_valid(sheet_principal) && value_sheet_principal > 0) {
+								if (check_money_valid(sheet_principal)) {
 									casetaskGr.u_principle = set_money_object(sheet_principal);
-								} 
-								else if (sheet_principal == "" && (sheet_state == "New" || sheet_state == "Cancelled")) {
+								} else if (sheet_principal == "" && (sheet_state == "New" || sheet_state == "Cancelled")) {
 									/* empty */
-								} 
-								else if (sheet_principal == "") {
+								} else if (sheet_principal == "") {
 									add_log(source.sys_import_set, row_count, target_record, "Error", 'โปรดระบุ "เงินต้น (บาท)"');
 									error_log = error_log + 1;
-								} 
-								else if (value_sheet_principal <= 0) {
-									add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "เงินต้น (บาท)" ต้องมากกว่า 0');
-									error_log = error_log + 1;
-								} 
-								else {
+								} else {
 									add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "เงินต้น (บาท)" ไม่ถูกต้อง');
 									error_log = error_log + 1;
 								}
@@ -668,30 +651,24 @@
 								// ภาระหนี้ที่ตกลงชำระ (บาท) validation rule
 								if (sheet_result == "ได้ข้อสรุปกับลูกค้า") {
 									// ใส่ค่าได้ทั้ง ทางด่วนแก้หนี้ และ โครงการคุณสู้ เราช่วย
-									if (check_money_valid(sheet_debt_agreed) && value_sheet_debt_agreed > 0) {
+									if (check_money_valid(sheet_debt_agreed)) {
 										casetaskGr.u_debt_confirm = set_money_object(sheet_debt_agreed);
 									}
 									// log error ของ ทางด่วนแก้หนี้
 									else if (debt_project == "ทางด่วนแก้หนี้") {
 										if (sheet_debt_agreed == "" && (sheet_state == "New" || sheet_state == "Cancelled")) {
 											//do nothing
-										} 
-										else if (sheet_debt_agreed == "") {
+										} else if (sheet_debt_agreed == "") {
 											add_log(source.sys_import_set, row_count, target_record, "Error", 'โปรดระบุ "ภาระหนี้ที่ตกลงชำระ (บาท)"');
 											error_log = error_log + 1;
-										} 
-										else if (value_sheet_debt_agreed <= 0) {
-											add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "ภาระหนี้ที่ตกลงชำระ (บาท)" ต้องมากกว่า 0');
-											error_log = error_log + 1;
-										}
-										else {
+										} else {
 											add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "ภาระหนี้ที่ตกลงชำระ (บาท)" ไม่ถูกต้อง');
 											error_log = error_log + 1;
 										}
 									}
 									// log error ของโครงการคุณสู้ เราช่วย
 									else if (debt_project == "โครงการคุณสู้ เราช่วย") {
-										if (sheet_debt_agreed == "" || sheet_debt_agreed == "0") {
+										if (sheet_debt_agreed == "") {
 											// do nothing
 										} else {
 											add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "ภาระหนี้ที่ตกลงชำระ (บาท)" ไม่ถูกต้อง');
@@ -727,15 +704,13 @@
 											error_log = error_log + 1;
 										} else {
 											var intValue = parseInt(sheet_no_payment, 10);
-											if (isNaN(intValue)){ // || intValue < 0) {
+											if (isNaN(intValue) || intValue < 0) {
 												add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "จำนวนงวดที่ชำระ (เดือน)" ไม่ถูกต้อง');
 												error_log = error_log + 1;
-											} else if (intValue <= 0) { 
-												add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "จำนวนงวดที่ชำระ (เดือน)" ต้องมากกว่า 0');
-												error_log = error_log + 1;
 											} else {
-												casetaskGr.u_installment = intValue;
+												casetaskGr.u_installment = parseInt(sheet_no_payment);
 											}
+
 										}
 									}
 									else if (debt_project == "โครงการคุณสู้ เราช่วย") {
@@ -758,7 +733,7 @@
 								// ปรากฎเมื่อ ผลการพิจารณา = ได้สรุปกับลูกค้า
 								if (sheet_result == "ได้ข้อสรุปกับลูกค้า") {
 									// ใส่ค่าได้ทั้งโครงการทางด่วนแก้หนี้ และ โครงการคุณสู้ เราช่วย
-									if (check_money_valid(sheet_monthly) && value_heet_monthly > 0) {
+									if (check_money_valid(sheet_monthly)) {
 										casetaskGr.u_amount_month = set_money_object(sheet_monthly);
 									} 
 									// log error
@@ -770,10 +745,6 @@
 											add_log(source.sys_import_set, row_count, target_record, "Error", 'โปรดระบุ "ค่างวดต่อเดือน (บาท)"');
 											error_log = error_log + 1;
 										}
-										else if (value_heet_monthly <= 0) {
-											add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "ค่างวดต่อเดือน (บาท)" ต้องมากกว่า 0');
-											error_log = error_log + 1;
-										}
 										else {
 											add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "ค่างวดต่อเดือน (บาท)" ไม่ถูกต้อง');
 											error_log = error_log + 1;
@@ -781,7 +752,7 @@
 									} 
 									// log error
 									else if (debt_project == "โครงการคุณสู้ เราช่วย") {
-										if (sheet_monthly == "" || sheet_monthly == "0") {
+										if (sheet_monthly == "") {
 											//do nothing
 										} 
 										else {
@@ -1256,28 +1227,22 @@
 						}
 						
 						// ภาระหนี้รวม (บาท) validation rule
-						if (check_money_valid(sheet_total_debt) && value_sheet_total_debt > 0) {
+						if (check_money_valid(sheet_total_debt)) {
 							casetaskGr.u_debt_burden = set_money_object(sheet_total_debt);
 						} else {
 							if (debt_project == "ทางด่วนแก้หนี้") {
 								if (sheet_total_debt == "" && (sheet_state == "New" || sheet_state == "Cancelled")) {
 									//do nothing
-								} 
-								else if (sheet_total_debt == "") {
+								} else if (sheet_total_debt == "") {
 									add_log(source.sys_import_set, row_count, target_record, "Error", 'โปรดระบุ "ภาระหนี้รวม (บาท)"');
 									error_log = error_log + 1;
-								} 
-								else if (value_sheet_total_debt <= 0) {
-									add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "ภาระหนี้รวม (บาท)" ต้องมากกว่า 0');
-									error_log = error_log + 1;
-								}
-								else {
+								} else {
 									add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "ภาระหนี้รวม (บาท)" ไม่ถูกต้อง');
 									error_log = error_log + 1;
 									//do nothing
 								}
 							} else if (debt_project == "โครงการคุณสู้ เราช่วย") {
-								if (sheet_total_debt == "" || sheet_total_debt == "0") {
+								if (sheet_total_debt == "") {
 									//do nothing
 								} else {
 									add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "ภาระหนี้รวม (บาท)" ไม่ถูกต้อง');
@@ -1288,24 +1253,16 @@
 						}
 
 						// เงินต้น (บาท)
-						if (check_money_valid(sheet_principal) && value_sheet_principal > 0) {
+						if (check_money_valid(sheet_principal)) {
 							casetaskGr.u_principle = set_money_object(sheet_principal);
-						} 
-						else if (sheet_principal == "" && (sheet_state == "New" || sheet_state == "Cancelled")) {
+						} else if (sheet_principal == "" && (sheet_state == "New" || sheet_state == "Cancelled")) {
 							/* empty */
-						} 
-						else if (sheet_state == "Cancelled") {
+						} else if (sheet_state == "Cancelled") {
 							/* empty */
-						} 
-						else if (sheet_principal == "") {
+						} else if (sheet_principal == "") {
 							add_log(source.sys_import_set, row_count, target_record, "Error", 'โปรดระบุ "เงินต้น (บาท)"');
 							error_log = error_log + 1;
-						}
-						else if (value_sheet_principal <= 0) {
-							add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "เงินต้น (บาท)" ต้องมากกว่า 0');
-							error_log = error_log + 1;
-						} 
-						else {
+						} else {
 							add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "เงินต้น (บาท)" ไม่ถูกต้อง');
 							error_log = error_log + 1;
 						}
@@ -1313,30 +1270,24 @@
 						// ภาระหนี้ที่ตกลงชำระ (บาท) validation rule
 						if (sheet_result == "ได้ข้อสรุปกับลูกค้า") {
 							// ใส่ค่าได้ทั้ง ทางด่วนแก้หนี้ และ โครงการคุณสู้ เราช่วย
-							if (check_money_valid(sheet_debt_agreed) && value_sheet_debt_agreed > 0) {
+							if (check_money_valid(sheet_debt_agreed)) {
 								casetaskGr.u_debt_confirm = set_money_object(sheet_debt_agreed);
 							}
 							// log error ของ ทางด่วนแก้หนี้
 							else if (debt_project == "ทางด่วนแก้หนี้") {
 								if (sheet_debt_agreed == "" && (sheet_state == "New" || sheet_state == "Cancelled")) {
 									//do nothing
-								} 
-								else if (sheet_debt_agreed == "") {
+								} else if (sheet_debt_agreed == "") {
 									add_log(source.sys_import_set, row_count, target_record, "Error", 'โปรดระบุ "ภาระหนี้ที่ตกลงชำระ (บาท)"');
 									error_log = error_log + 1;
-								} 
-								else if (value_sheet_debt_agreed <= 0) {
-									add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "ภาระหนี้ที่ตกลงชำระ (บาท)" ต้องมากกว่า 0');
-									error_log = error_log + 1;
-								}
-								else {
+								} else {
 									add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "ภาระหนี้ที่ตกลงชำระ (บาท)" ไม่ถูกต้อง');
 									error_log = error_log + 1;
 								}
 							}
 							// log error ของโครงการคุณสู้ เราช่วย
 							else if (debt_project == "โครงการคุณสู้ เราช่วย") {
-								if (sheet_debt_agreed == "" || sheet_debt_agreed == "0") {
+								if (sheet_debt_agreed == "") {
 									// do nothing
 								} else {
 									add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "ภาระหนี้ที่ตกลงชำระ (บาท)" ไม่ถูกต้อง');
@@ -1357,14 +1308,11 @@
 									error_log = error_log + 1;
 								} else {
 									var intValue = parseInt(sheet_no_payment, 10);
-										if (isNaN(intValue)){ // || intValue < 0) {
-											add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "จำนวนงวดที่ชำระ (เดือน)" ไม่ถูกต้อง');
-											error_log = error_log + 1;
-										} else if (intValue <= 0) { 
-											add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "จำนวนงวดที่ชำระ (เดือน)" ต้องมากกว่า 0');
-											error_log = error_log + 1;
-										} else {
-											casetaskGr.u_installment = intValue;
+									if (isNaN(intValue) || intValue < 0) {
+										add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "จำนวนงวดที่ชำระ (เดือน)" ไม่ถูกต้อง');
+										error_log = error_log + 1;
+									} else {
+										casetaskGr.u_installment = parseInt(sheet_no_payment);
 									}
 
 								}
@@ -1389,7 +1337,7 @@
 						// ปรากฎเมื่อ ผลการพิจารณา = ได้สรุปกับลูกค้า
 						if (sheet_result == "ได้ข้อสรุปกับลูกค้า") {
 							// ใส่ค่าได้ทั้งโครงการทางด่วนแก้หนี้ และ โครงการคุณสู้ เราช่วย
-							if (check_money_valid(sheet_monthly) && value_sheet_monthly > 0) {
+							if (check_money_valid(sheet_monthly)) {
 								casetaskGr.u_amount_month = set_money_object(sheet_monthly);
 							} 
 							// log error
@@ -1398,11 +1346,7 @@
 									//do nothing
 								}
 								else if (sheet_monthly == "") {
-									add_log(source.sys_import_set, row_count, target_record, "Error", 'โปรดระบุ "ค่างวดต่อเดือน (บาท)"');
-									error_log = error_log + 1;
-								}
-								else if (value_sheet_monthly <= 0) {
-									add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "ค่างวดต่อเดือน (บาท)" ต้องมากกว่า 0');
+									add_log(source.sys_import_set, row_count, target_record, "Error", 'โปรดระบถ "ค่างวดต่อเดือน (บาท)"');
 									error_log = error_log + 1;
 								}
 								else {
@@ -1412,7 +1356,7 @@
 							} 
 							// log error
 							else if (debt_project == "โครงการคุณสู้ เราช่วย") {
-								if (sheet_monthly == "" || sheet_monthly == "0") {
+								if (sheet_monthly == "") {
 									//do nothing
 								} 
 								else {
@@ -2006,10 +1950,4 @@ function sleep(ms) {
 	var unixtime_ms = new Date().getTime();
 	while (new Date().getTime() < unixtime_ms + ms) { }
 
-}
-
-function setNumber(moneyFiled){
-	var x = moneyFiled.replace("฿", "");
-	var y = x.replace(",", "");
-	return y;
 }
