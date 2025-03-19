@@ -3,7 +3,7 @@
 
 	var importExcelAttachmentSysId = "";
 	try {
-		gs.info("Start Transform Script : onCompletee");
+		gs.info("[Excel Bulk Upload]Start Transform Script : onCompletee");
 		var targetTable = source.getTableName();
 		var targetGR = new GlideRecord(targetTable);
 		targetGR.addQuery('sys_import_set', source.sys_import_set);
@@ -125,7 +125,7 @@
 
 				var sheet_product = targetGR.u_ผล_ตภ_ณฑ_;
 				if (sheet_product == '' || sheet_product == null) {
-					//    gs.info('sheet_guidelines_debtorssssssssssssllllllllllds');
+					// do nothong
 
 				} else {
 					sheet_product = targetGR.u_ผล_ตภ_ณฑ_.split("|")[0].trim();
@@ -134,7 +134,7 @@
 
 				var sheet_account_status = targetGR.u_สถานะบ_ญช_;
 				if (sheet_account_status == '' || sheet_account_status == null) {
-					//    gs.info('sheet_guidelines_debtorssssssssssssllllllllllds');
+					// do nothong
 
 				} else {
 					sheet_account_status = targetGR.u_สถานะบ_ญช_.split("|")[0].trim();
@@ -165,18 +165,17 @@
 				// แนวทางการช่วยเหลือลูกหนี้
 				var sheet_guidelines_debtors = targetGR.u_แนวทางการช_วยเหล_อล_กหน__;
 				if (sheet_guidelines_debtors == '' || sheet_guidelines_debtors == null) {
-					//gs.info('sheet_guidelines_debtorssssssssssssllllllllllds');
+					// do nothing
 				} else {
-					//  gs.info('sheet_guidelines_debtorssssssssseeeeeeeeeeeeeeeedlds');
+					// do nothing
 					sheet_guidelines_debtors = targetGR.u_แนวทางการช_วยเหล_อล_กหน__.split("|")[0].trim();
 				}
 
 				var sheet_reason_not_help = targetGR.u_เหต_ผลท__ไม__หล_อล_กหน__ได_;
 				if (sheet_reason_not_help == '' || sheet_reason_not_help == null) {
-					//    gs.info('sheet_guidelines_debtorssssssssssssllllllllllds');
+					// do nothing
 
 				} else {
-					//  gs.info('sheet_guidelines_debtorssssssssseeeeeeeeeeeeeeeedlds');
 					sheet_reason_not_help = targetGR.u_เหต_ผลท__ไม__หล_อล_กหน__ได_.split("|")[0].trim();
 				}
 				// ภาระหนี้รวม (บาท)
@@ -227,21 +226,24 @@
 								error_log = error_log + 1;
 								continue;
 							} else {
-								if (check_date_valid(sheet_drd_report)) {
-									casetaskDT.u_drd = set_date_object(sheet_drd_report);
-									gs.info("[Excel Bulk Upload DET] วันที่ทำสัญญา " + set_date_object(sheet_drd_report));
-								} else {
-									add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "วันที่ทำสัญญา" ไม่ถูกต้อง โปรดระบุใน format DD-MM-YYYY');
-									error_log = error_log + 1;
+								if (sheet_drd_report) {
+									if (check_date_valid(sheet_drd_report)) {
+										casetaskDT.u_drd = set_date_object(sheet_drd_report);
+										gs.info("[Excel Bulk Upload][DET] วันที่ทำสัญญา " + set_date_object(sheet_drd_report));
+									} else {
+										add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "วันที่ทำสัญญา" ไม่ถูกต้อง โปรดระบุใน format DD-MM-YYYY');
+										error_log = error_log + 1;
+									}
 								}
 
-								if (sheet_rdt_report == "" || check_date_valid(sheet_rdt_report)) {
-									casetaskDT.u_rdt = set_date_object(sheet_rdt_report);
-								} else {
-									add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "รายงาน RDT" ไม่ถูกต้อง โปรดระบุใน format DD-MM-YYYY');
-									error_log = error_log + 1;
+								if (sheet_rdt_report) {
+									if (sheet_rdt_report == "" || check_date_valid(sheet_rdt_report)) {
+										casetaskDT.u_rdt = set_date_object(sheet_rdt_report);
+									} else {
+										add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "รายงาน RDT" ไม่ถูกต้อง โปรดระบุใน format DD-MM-YYYY');
+										error_log = error_log + 1;
+									}
 								}
-
 							}
 
 							// Update Section
@@ -288,23 +290,27 @@
 							} else if (casetaskGr.state == 3 || casetaskGr.state == 6) {
 								// 3 == Closed && 6 == Resolved && 7 == Cancelled
 								// รายงาน RDT
-								if (sheet_rdt_report == "" || check_date_valid(sheet_rdt_report)) {
-									if (check_date_valid(sheet_rdt_report)){
-										casetaskGr.u_rdt = set_date_object(sheet_rdt_report);
+								if (sheet_rdt_report) {
+									if (sheet_rdt_report == "" || check_date_valid(sheet_rdt_report)) {
+										if (check_date_valid(sheet_rdt_report)) {
+											casetaskGr.u_rdt = set_date_object(sheet_rdt_report);
+										}
+									} else {
+										add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "รายงาน RDT" ไม่ถูกต้อง โปรดระบุใน format DD-MM-YYYY');
+										error_log = error_log + 1;
 									}
-								} else {
-									add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "รายงาน RDT" ไม่ถูกต้อง โปรดระบุใน format DD-MM-YYYY');
-									error_log = error_log + 1;
 								}
 
 								// รายงาน DRD
-								if (sheet_drd_report == "" || check_date_valid(sheet_drd_report)) {
-									if (check_date_valid(sheet_drd_report)){
-										casetaskGr.u_drd = set_date_object(sheet_drd_report);
+								if (sheet_drd_report) {
+									if (sheet_drd_report == "" || check_date_valid(sheet_drd_report)) {
+										if (check_date_valid(sheet_drd_report)) {
+											casetaskGr.u_drd = set_date_object(sheet_drd_report);
+										}
+									} else {
+										add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "วันที่ทำสัญญา" ไม่ถูกต้อง โปรดระบุใน format DD-MM-YYYY');
+										error_log = error_log + 1;
 									}
-								} else {
-									add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "วันที่ทำสัญญา" ไม่ถูกต้อง โปรดระบุใน format DD-MM-YYYY');
-									error_log = error_log + 1;
 								}
 
 
@@ -386,7 +392,6 @@
 								// เลขที่ทะเบียนรถ validation rule
 								// car
 								if (carProduct.includes(sheet_product)) {
-									gs.info(sheet_vehicle_number == "" && debt_project == "ทางด่วนแก้หนี้");
 									if (sheet_vehicle_number == "" && debt_project == "ทางด่วนแก้หนี้") {
 										add_log(source.sys_import_set, row_count, target_record, "Error", 'โปรดระบุ "เลขที่ทะเบียนรถ"');
 										error_log = error_log + 1;
@@ -434,7 +439,7 @@
 								if (check_datetime_valid(sheet_date_of_start)) {
 									casetaskGr.u_contact_debt = set_timezone_object(sheet_date_of_start);
 								} else if (debt_project == "ทางด่วนแก้หนี้") {
-									if (sheet_date_of_start == "" && (sheet_state == "New" || sheet_state == "Cancelled")) {
+									if (sheet_date_of_start == "" && (sheet_state == "New" || sheet_state == "Cancelled" || sheet_state == "Awaiting Info")) {
 										//do nothing
 									}
 									else if (sheet_date_of_start == "") {
@@ -577,7 +582,11 @@
 
 								// แนวทางการช่วยเหลือลูกหนี้
 								if (sheet_result == "ได้ข้อสรุปกับลูกค้า") {
-									if (check_select_valid_activePipe2('u_glideline_debtor', "u_name=" + sheet_guidelines_debtors, debt_project)) {
+									if (sheet_guidelines_debtors == "") {
+										add_log(source.sys_import_set, row_count, target_record, "Error", 'โปรดระบุ "แนวทางการช่วยเหลือลูกหนี้"' + sheet_guidelines_debtors);
+										error_log = error_log + 1;
+									}
+									else if (check_select_valid_activePipe2('u_glideline_debtor', "u_name=" + sheet_guidelines_debtors, debt_project)) {
 										var glideline_debt = get_select_valid_active_check_fair('u_glideline_debtor', 'u_name', sheet_guidelines_debtors, debt_project);
 										if (glideline_debt == "Error") {
 											add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "แนวทางการช่วยเหลือลูกหนี้" ไม่ถูกต้อง' + sheet_guidelines_debtors);
@@ -585,10 +594,8 @@
 										} else {
 											casetaskGr.u_glideline_debt = glideline_debt;
 										}
-									} else if (sheet_guidelines_debtors == "") {
-										add_log(source.sys_import_set, row_count, target_record, "Error", 'โปรดระบุ "แนวทางการช่วยเหลือลูกหนี้"' + sheet_guidelines_debtors);
-										error_log = error_log + 1;
-									} else {
+									}
+									else {
 										add_log(source.sys_import_set, row_count, target_record, "Error", 'โปรดระบุ "แนวทางการช่วยเหลือลูกหนี้" ให้ถูกต้องตามโครงการ' + sheet_guidelines_debtors);
 										error_log = error_log + 1;
 									}
@@ -596,7 +603,11 @@
 
 								// เหตุผลที่ไม่สามารถช่วยเหลือลูกหนี้ได้
 								if (sheet_result == "ไม่ได้ข้อสรุปกับลูกค้า") {
-									if (check_select_valid_activePipe2('u_unable_help', "u_name=" + sheet_reason_not_help, debt_project)) {
+									if (sheet_reason_not_help == "") {
+										add_log(source.sys_import_set, row_count, target_record, "Error", 'โปรดระบุ "เหตุผลที่ไม่สามารถช่วยเหลือลูกหนี้ได้"');
+										error_log = error_log + 1;
+									}
+									else if (check_select_valid_activePipe2('u_unable_help', "u_name=" + sheet_reason_not_help, debt_project)) {
 										var reason_unable_help = get_select_valid_active_check_fair('u_unable_help', 'u_name', sheet_reason_not_help, debt_project);
 										if (reason_unable_help == "Error") {
 											add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "เหตุผลที่ไม่สามารถช่วยเหลือลูกหนี้ได้" ไม่ถูกต้อง');
@@ -604,10 +615,8 @@
 										} else {
 											casetaskGr.u_reason_unable_help = reason_unable_help;
 										}
-									} else if (sheet_reason_not_help == "") {
-										add_log(source.sys_import_set, row_count, target_record, "Error", 'โปรดระบุ "เหตุผลที่ไม่สามารถช่วยเหลือลูกหนี้ได้"');
-										error_log = error_log + 1;
-									} else {
+									}
+									else {
 										add_log(source.sys_import_set, row_count, target_record, "Error", 'โปรดระบุ "เหตุผลที่ไม่สามารถช่วยเหลือลูกหนี้ได้" ให้ถูกต้องตามโครงการ');
 										error_log = error_log + 1;
 
@@ -619,13 +628,13 @@
 									casetaskGr.u_debt_burden = set_money_object(sheet_total_debt);
 								} else {
 									if (debt_project == "ทางด่วนแก้หนี้") {
-										if (sheet_total_debt == "" && (sheet_state == "New" || sheet_state == "Cancelled")) {
+										if (sheet_total_debt == "" && (sheet_state == "New" || sheet_state == "Cancelled" || sheet_state == "Awaiting Info")) {
 											//do nothing
-										} 
+										}
 										else if (sheet_total_debt == "") {
 											add_log(source.sys_import_set, row_count, target_record, "Error", 'โปรดระบุ "ภาระหนี้รวม (บาท)"');
 											error_log = error_log + 1;
-										} 
+										}
 										else if (value_sheet_total_debt <= 0) {
 											add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "ภาระหนี้รวม (บาท)"  ต้องมากกว่า 0');
 											error_log = error_log + 1;
@@ -635,9 +644,14 @@
 											error_log = error_log + 1;
 										}
 									} else if (debt_project == "โครงการคุณสู้ เราช่วย") {
-										if (sheet_total_debt == "") {
+										if (sheet_total_debt == "" || value_sheet_total_debt == 0) {
 											//do nothing
-										} else {
+										}
+										else if (value_sheet_total_debt < 0) {
+											add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "ภาระหนี้รวม (บาท)"  ต้องมากกว่า 0');
+											error_log = error_log + 1;
+										}
+										else {
 											add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "ภาระหนี้รวม (บาท)" ไม่ถูกต้อง');
 											error_log = error_log + 1;
 										}
@@ -648,18 +662,18 @@
 								// เงินต้น (บาท)
 								if (check_money_valid(sheet_principal) && value_sheet_principal > 0) {
 									casetaskGr.u_principle = set_money_object(sheet_principal);
-								} 
-								else if (sheet_principal == "" && (sheet_state == "New" || sheet_state == "Cancelled")) {
+								}
+								else if (sheet_principal == "" && (sheet_state == "New" || sheet_state == "Cancelled" || sheet_state == "Awaiting Info")) {
 									/* empty */
-								} 
+								}
 								else if (sheet_principal == "") {
 									add_log(source.sys_import_set, row_count, target_record, "Error", 'โปรดระบุ "เงินต้น (บาท)"');
 									error_log = error_log + 1;
-								} 
+								}
 								else if (value_sheet_principal <= 0) {
 									add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "เงินต้น (บาท)" ต้องมากกว่า 0');
 									error_log = error_log + 1;
-								} 
+								}
 								else {
 									add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "เงินต้น (บาท)" ไม่ถูกต้อง');
 									error_log = error_log + 1;
@@ -673,13 +687,13 @@
 									}
 									// log error ของ ทางด่วนแก้หนี้
 									else if (debt_project == "ทางด่วนแก้หนี้") {
-										if (sheet_debt_agreed == "" && (sheet_state == "New" || sheet_state == "Cancelled")) {
+										if (sheet_debt_agreed == "" && (sheet_state == "New" || sheet_state == "Cancelled" || sheet_state == "Awaiting Info")) {
 											//do nothing
-										} 
+										}
 										else if (sheet_debt_agreed == "") {
 											add_log(source.sys_import_set, row_count, target_record, "Error", 'โปรดระบุ "ภาระหนี้ที่ตกลงชำระ (บาท)"');
 											error_log = error_log + 1;
-										} 
+										}
 										else if (value_sheet_debt_agreed <= 0) {
 											add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "ภาระหนี้ที่ตกลงชำระ (บาท)" ต้องมากกว่า 0');
 											error_log = error_log + 1;
@@ -690,10 +704,16 @@
 										}
 									}
 									// log error ของโครงการคุณสู้ เราช่วย
+									// ไม่ใส่ค่าก็ได้ แต่ถ้าใส่ ต้องเป็นค่าที่มากกว่า 0
 									else if (debt_project == "โครงการคุณสู้ เราช่วย") {
-										if (sheet_debt_agreed == "" || sheet_debt_agreed == "0") {
+										if (sheet_debt_agreed == "" || value_sheet_debt_agreed == 0) {
 											// do nothing
-										} else {
+										}
+										else if (value_sheet_debt_agreed < 0) {
+											add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "ภาระหนี้ที่ตกลงชำระ (บาท)" ต้องมากกว่า 0');
+											error_log = error_log + 1;
+										}
+										else {
 											add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "ภาระหนี้ที่ตกลงชำระ (บาท)" ไม่ถูกต้อง');
 											error_log = error_log + 1;
 										}
@@ -720,21 +740,26 @@
 								if (sheet_result == "ได้ข้อสรุปกับลูกค้า") {
 									// ทางด่วนแก้หนี้ required จำนวนงวดที่ต้องชำระ
 									if (debt_project == "ทางด่วนแก้หนี้") {
-										if (sheet_no_payment == "" && (sheet_state == "New" || sheet_state == "Cancelled")) {
+										if (sheet_no_payment == "" && (sheet_state == "New" || sheet_state == "Cancelled" || sheet_state == "Awaiting Info")) {
 											//do nothing
 										} else if (sheet_no_payment == "") {
 											add_log(source.sys_import_set, row_count, target_record, "Error", 'โปรดระบุ "จำนวนงวดที่ชำระ (เดือน)"');
 											error_log = error_log + 1;
 										} else {
-											var intValue = parseInt(sheet_no_payment, 10);
-											if (isNaN(intValue)){ // || intValue < 0) {
+											try {
+												var intValue = parseInt(sheet_no_payment, 10);
+												if (isNaN(intValue)) { // || intValue < 0) {
+													add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "จำนวนงวดที่ชำระ (เดือน)" ไม่ถูกต้อง');
+													error_log = error_log + 1;
+												} else if (intValue <= 0) {
+													add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "จำนวนงวดที่ชำระ (เดือน)" ต้องมากกว่า 0');
+													error_log = error_log + 1;
+												} else {
+													casetaskGr.u_installment = intValue;
+												}
+											} catch (e) {
 												add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "จำนวนงวดที่ชำระ (เดือน)" ไม่ถูกต้อง');
 												error_log = error_log + 1;
-											} else if (intValue <= 0) { 
-												add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "จำนวนงวดที่ชำระ (เดือน)" ต้องมากกว่า 0');
-												error_log = error_log + 1;
-											} else {
-												casetaskGr.u_installment = intValue;
 											}
 										}
 									}
@@ -743,12 +768,17 @@
 										if (sheet_no_payment == "") {
 											//do nothing
 										} else {
-											var intValue = parseInt(sheet_no_payment, 10);
-											if (isNaN(intValue) || intValue < 0) {
+											try {
+												var intValue = parseInt(sheet_no_payment, 10);
+												if (isNaN(intValue) || intValue < 0) {
+													add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "จำนวนงวดที่ชำระ (เดือน)" ไม่ถูกต้อง');
+													error_log = error_log + 1;
+												} else {
+													casetaskGr.u_installment = parseInt(sheet_no_payment);
+												}
+											} catch (e) {
 												add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "จำนวนงวดที่ชำระ (เดือน)" ไม่ถูกต้อง');
 												error_log = error_log + 1;
-											} else {
-												casetaskGr.u_installment = parseInt(sheet_no_payment);
 											}
 										}
 									}
@@ -758,19 +788,19 @@
 								// ปรากฎเมื่อ ผลการพิจารณา = ได้สรุปกับลูกค้า
 								if (sheet_result == "ได้ข้อสรุปกับลูกค้า") {
 									// ใส่ค่าได้ทั้งโครงการทางด่วนแก้หนี้ และ โครงการคุณสู้ เราช่วย
-									if (check_money_valid(sheet_monthly) && value_heet_monthly > 0) {
+									if (check_money_valid(sheet_monthly) && value_sheet_monthly > 0) {
 										casetaskGr.u_amount_month = set_money_object(sheet_monthly);
-									} 
+									}
 									// log error
 									else if (debt_project == "ทางด่วนแก้หนี้") {
-										if (sheet_monthly == "" && (sheet_state == "New" || sheet_state == "Cancelled")) {
+										if (sheet_monthly == "" && (sheet_state == "New" || sheet_state == "Cancelled" || sheet_state == "Awaiting Info")) {
 											//do nothing
 										}
 										else if (sheet_monthly == "") {
 											add_log(source.sys_import_set, row_count, target_record, "Error", 'โปรดระบุ "ค่างวดต่อเดือน (บาท)"');
 											error_log = error_log + 1;
 										}
-										else if (value_heet_monthly <= 0) {
+										else if (value_sheet_monthly <= 0) {
 											add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "ค่างวดต่อเดือน (บาท)" ต้องมากกว่า 0');
 											error_log = error_log + 1;
 										}
@@ -778,12 +808,16 @@
 											add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "ค่างวดต่อเดือน (บาท)" ไม่ถูกต้อง');
 											error_log = error_log + 1;
 										}
-									} 
+									}
 									// log error
 									else if (debt_project == "โครงการคุณสู้ เราช่วย") {
-										if (sheet_monthly == "" || sheet_monthly == "0") {
+										if (sheet_monthly == "" || value_sheet_monthly == 0) {
 											//do nothing
-										} 
+										}
+										else if (value_sheet_monthly < 0) {
+											add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "ค่างวดต่อเดือน (บาท)" ต้องมากกว่า 0');
+											error_log = error_log + 1;
+										}
 										else {
 											add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "ค่างวดต่อเดือน (บาท)" ไม่ถูกต้อง');
 											error_log = error_log + 1;
@@ -793,24 +827,28 @@
 								}
 
 								// รายงาน RDT
-								if (sheet_rdt_report == "" || check_date_valid(sheet_rdt_report)) {
-									if (check_date_valid(sheet_rdt_report)){
-										casetaskGr.u_rdt = set_date_object(sheet_rdt_report);
+								if (sheet_rdt_report) {
+									if (sheet_rdt_report == "" || check_date_valid(sheet_rdt_report)) {
+										if (check_date_valid(sheet_rdt_report)) {
+											casetaskGr.u_rdt = set_date_object(sheet_rdt_report);
+										}
+
+									} else {
+										add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "รายงาน RDT" ไม่ถูกต้อง โปรดระบุใน format DD-MM-YYYY');
+										error_log = error_log + 1;
 									}
-									
-								} else {
-									add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "รายงาน RDT" ไม่ถูกต้อง โปรดระบุใน format DD-MM-YYYY');
-									error_log = error_log + 1;
 								}
 
 								// รายงาน DRD
-								if (sheet_drd_report == "" || check_date_valid(sheet_drd_report)) {
-									if (check_date_valid(sheet_drd_report)){
-										casetaskGr.u_drd = set_date_object(sheet_drd_report);
+								if (sheet_drd_report) {
+									if (sheet_drd_report == "" || check_date_valid(sheet_drd_report)) {
+										if (check_date_valid(sheet_drd_report)) {
+											casetaskGr.u_drd = set_date_object(sheet_drd_report);
+										}
+									} else {
+										add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "วันที่ทำสัญญา" ไม่ถูกต้อง โปรดระบุใน format DD-MM-YYYY');
+										error_log = error_log + 1;
 									}
-								} else {
-									add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "วันที่ทำสัญญา" ไม่ถูกต้อง โปรดระบุใน format DD-MM-YYYY');
-									error_log = error_log + 1;
 								}
 
 								//closenote and other infoemation
@@ -828,7 +866,7 @@
 								// Update Section
 								if (error_log == 0) {
 									casetaskGr.update();
-									gs.info('u_resolution_code' + casetaskGr.u_resolution_code);
+									gs.info('[Excel Bulk Upload][DEB][Update]u_resolution_code' + casetaskGr.u_resolution_code);
 									add_log(source.sys_import_set, row_count, target_record, "Update", "อัพเดทข้อมูลสำเร็จ");
 									// test(targetGR, sheet_case_task_id);
 								} else {
@@ -907,7 +945,6 @@
 
 
 						var cGr = new GlideRecord('x_baot_debt_sett_0_ect_debt_settlement');
-						//  gs.info('sheet_case_ref' + sheet_case_ref);
 						cGr.addQuery('number', sheet_case_ref);
 
 						cGr.query();
@@ -1080,7 +1117,7 @@
 						// ใบงานเป็น เป็น inprogress หรือ Resolved จะต้องมีเลขที่บัตร/ เลขที่สัญญา ส่วนถ้าเป็น cancelled หรือ closed หรือ open ไม่ได้ required
 						if (sheet_contract_number != "") {
 							casetaskGr.u_number_contact = sheet_contract_number;
-						} 
+						}
 						// else if (sheet_contract_number == "" && (sheet_state == "Cancelled" || sheet_state == "Closed" || sheet_state == "Open" || sheet_state == "New")) {
 						// 	//do nothing
 						// }
@@ -1093,7 +1130,7 @@
 						if (check_datetime_valid(sheet_date_of_start)) {
 							casetaskGr.u_contact_debt = set_timezone_object(sheet_date_of_start);
 						} else if (debt_project == "ทางด่วนแก้หนี้") {
-							if (sheet_date_of_start == "" && (sheet_state == "New" || sheet_state == "Cancelled")) {
+							if (sheet_date_of_start == "" && (sheet_state == "New" || sheet_state == "Cancelled" || sheet_state == "Awaiting Info")) {
 								//do nothing
 							}
 							else if (sheet_date_of_start == "") {
@@ -1217,7 +1254,12 @@
 
 						// แนวทางการช่วยเหลือลูกหนี้
 						if (sheet_result == "ได้ข้อสรุปกับลูกค้า") {
-							if (check_select_valid_activePipe2('u_glideline_debtor', "u_name=" + sheet_guidelines_debtors, debt_project)) {
+
+							if (sheet_guidelines_debtors == "") {
+								add_log(source.sys_import_set, row_count, target_record, "Error", 'โปรดระบุ "แนวทางการช่วยเหลือลูกหนี้"' + sheet_guidelines_debtors);
+								error_log = error_log + 1;
+							}
+							else if (check_select_valid_activePipe2('u_glideline_debtor', "u_name=" + sheet_guidelines_debtors, debt_project)) {
 								var glideline_debt = get_select_valid_active_check_fair('u_glideline_debtor', 'u_name', sheet_guidelines_debtors, debt_project);
 								if (glideline_debt == "Error") {
 									add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "แนวทางการช่วยเหลือลูกหนี้" ไม่ถูกต้อง' + sheet_guidelines_debtors);
@@ -1225,10 +1267,8 @@
 								} else {
 									casetaskGr.u_glideline_debt = glideline_debt;
 								}
-							} else if (sheet_guidelines_debtors == "") {
-								add_log(source.sys_import_set, row_count, target_record, "Error", 'โปรดระบุ "แนวทางการช่วยเหลือลูกหนี้"' + sheet_guidelines_debtors);
-								error_log = error_log + 1;
-							} else {
+							}
+							else {
 								add_log(source.sys_import_set, row_count, target_record, "Error", 'โปรดระบุ "แนวทางการช่วยเหลือลูกหนี้" ให้ถูกต้องตามโครงการ' + sheet_guidelines_debtors);
 								error_log = error_log + 1;
 							}
@@ -1237,7 +1277,11 @@
 
 						// เหตุผลที่ไม่สามารถช่วยเหลือลูกหนี้ได้
 						if (sheet_result == "ไม่ได้ข้อสรุปกับลูกค้า") {
-							if (check_select_valid_activePipe2('u_unable_help', "u_name=" + sheet_reason_not_help, debt_project)) {
+							if (sheet_reason_not_help == "") {
+								add_log(source.sys_import_set, row_count, target_record, "Error", 'โปรดระบุ "เหตุผลที่ไม่สามารถช่วยเหลือลูกหนี้ได้"');
+								error_log = error_log + 1;
+							}
+							else if (check_select_valid_activePipe2('u_unable_help', "u_name=" + sheet_reason_not_help, debt_project)) {
 								var reason_unable_help = get_select_valid_active_check_fair('u_unable_help', 'u_name', sheet_reason_not_help, debt_project);
 								if (reason_unable_help == "Error") {
 									add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "เหตุผลที่ไม่สามารถช่วยเหลือลูกหนี้ได้" ไม่ถูกต้อง');
@@ -1245,28 +1289,26 @@
 								} else {
 									casetaskGr.u_reason_unable_help = reason_unable_help;
 								}
-							} else if (sheet_reason_not_help == "") {
-								add_log(source.sys_import_set, row_count, target_record, "Error", 'โปรดระบุ "เหตุผลที่ไม่สามารถช่วยเหลือลูกหนี้ได้"');
-								error_log = error_log + 1;
-							} else {
+							}
+							else {
 								add_log(source.sys_import_set, row_count, target_record, "Error", 'โปรดระบุ "เหตุผลที่ไม่สามารถช่วยเหลือลูกหนี้ได้" ให้ถูกต้องตามโครงการ');
 								error_log = error_log + 1;
 
 							}
 						}
-						
+
 						// ภาระหนี้รวม (บาท) validation rule
 						if (check_money_valid(sheet_total_debt) && value_sheet_total_debt > 0) {
 							casetaskGr.u_debt_burden = set_money_object(sheet_total_debt);
 						} else {
 							if (debt_project == "ทางด่วนแก้หนี้") {
-								if (sheet_total_debt == "" && (sheet_state == "New" || sheet_state == "Cancelled")) {
+								if (sheet_total_debt == "" && (sheet_state == "New" || sheet_state == "Cancelled" || sheet_state == "Awaiting Info")) {
 									//do nothing
-								} 
+								}
 								else if (sheet_total_debt == "") {
 									add_log(source.sys_import_set, row_count, target_record, "Error", 'โปรดระบุ "ภาระหนี้รวม (บาท)"');
 									error_log = error_log + 1;
-								} 
+								}
 								else if (value_sheet_total_debt <= 0) {
 									add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "ภาระหนี้รวม (บาท)" ต้องมากกว่า 0');
 									error_log = error_log + 1;
@@ -1277,9 +1319,14 @@
 									//do nothing
 								}
 							} else if (debt_project == "โครงการคุณสู้ เราช่วย") {
-								if (sheet_total_debt == "" || sheet_total_debt == "0") {
+								if (sheet_total_debt == "" || value_sheet_total_debt == 0) {
 									//do nothing
-								} else {
+								}
+								else if (value_sheet_total_debt < 0) {
+									add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "ภาระหนี้รวม (บาท)" ต้องมากกว่า 0');
+									error_log = error_log + 1;
+								}
+								else {
 									add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "ภาระหนี้รวม (บาท)" ไม่ถูกต้อง');
 									error_log = error_log + 1;
 								}
@@ -1290,13 +1337,14 @@
 						// เงินต้น (บาท)
 						if (check_money_valid(sheet_principal) && value_sheet_principal > 0) {
 							casetaskGr.u_principle = set_money_object(sheet_principal);
-						} 
-						else if (sheet_principal == "" && (sheet_state == "New" || sheet_state == "Cancelled")) {
+						}
+						// add Awaiting Info
+						else if (sheet_principal == "" && (sheet_state == "New" || sheet_state == "Cancelled" || sheet_state == "Awaiting Info")) {
 							/* empty */
-						} 
+						}
 						else if (sheet_state == "Cancelled") {
 							/* empty */
-						} 
+						}
 						else if (sheet_principal == "") {
 							add_log(source.sys_import_set, row_count, target_record, "Error", 'โปรดระบุ "เงินต้น (บาท)"');
 							error_log = error_log + 1;
@@ -1304,7 +1352,7 @@
 						else if (value_sheet_principal <= 0) {
 							add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "เงินต้น (บาท)" ต้องมากกว่า 0');
 							error_log = error_log + 1;
-						} 
+						}
 						else {
 							add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "เงินต้น (บาท)" ไม่ถูกต้อง');
 							error_log = error_log + 1;
@@ -1318,13 +1366,13 @@
 							}
 							// log error ของ ทางด่วนแก้หนี้
 							else if (debt_project == "ทางด่วนแก้หนี้") {
-								if (sheet_debt_agreed == "" && (sheet_state == "New" || sheet_state == "Cancelled")) {
+								if (sheet_debt_agreed == "" && (sheet_state == "New" || sheet_state == "Cancelled" || sheet_state == "Awaiting Info")) {
 									//do nothing
-								} 
+								}
 								else if (sheet_debt_agreed == "") {
 									add_log(source.sys_import_set, row_count, target_record, "Error", 'โปรดระบุ "ภาระหนี้ที่ตกลงชำระ (บาท)"');
 									error_log = error_log + 1;
-								} 
+								}
 								else if (value_sheet_debt_agreed <= 0) {
 									add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "ภาระหนี้ที่ตกลงชำระ (บาท)" ต้องมากกว่า 0');
 									error_log = error_log + 1;
@@ -1336,9 +1384,14 @@
 							}
 							// log error ของโครงการคุณสู้ เราช่วย
 							else if (debt_project == "โครงการคุณสู้ เราช่วย") {
-								if (sheet_debt_agreed == "" || sheet_debt_agreed == "0") {
+								if (sheet_debt_agreed == "" || value_sheet_debt_agreed == 0) {
 									// do nothing
-								} else {
+								}
+								else if (value_sheet_debt_agreed < 0) {
+									add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "ภาระหนี้ที่ตกลงชำระ (บาท)" ต้องมากกว่า 0');
+									error_log = error_log + 1;
+								}
+								else {
 									add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "ภาระหนี้ที่ตกลงชำระ (บาท)" ไม่ถูกต้อง');
 									error_log = error_log + 1;
 								}
@@ -1350,37 +1403,47 @@
 						if (sheet_result == "ได้ข้อสรุปกับลูกค้า") {
 							// ทางด่วนแก้หนี้ required จำนวนงวดที่ต้องชำระ
 							if (debt_project == "ทางด่วนแก้หนี้") {
-								if (sheet_no_payment == "" && (sheet_state == "New" || sheet_state == "Cancelled")) {
+								if (sheet_no_payment == "" && (sheet_state == "New" || sheet_state == "Cancelled" || sheet_state == "Awaiting Info")) {
 									//do nothing
 								} else if (sheet_no_payment == "") {
 									add_log(source.sys_import_set, row_count, target_record, "Error", 'โปรดระบุ "จำนวนงวดที่ชำระ (เดือน)"');
 									error_log = error_log + 1;
 								} else {
-									var intValue = parseInt(sheet_no_payment, 10);
-										if (isNaN(intValue)){ // || intValue < 0) {
+									try {
+										var intValue = parseInt(sheet_no_payment, 10);
+										if (isNaN(intValue)) { // || intValue < 0) {
 											add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "จำนวนงวดที่ชำระ (เดือน)" ไม่ถูกต้อง');
 											error_log = error_log + 1;
-										} else if (intValue <= 0) { 
+										} else if (intValue <= 0) {
 											add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "จำนวนงวดที่ชำระ (เดือน)" ต้องมากกว่า 0');
 											error_log = error_log + 1;
 										} else {
 											casetaskGr.u_installment = intValue;
+										}
+									} catch (e) {
+										add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "จำนวนงวดที่ชำระ (เดือน)" ไม่ถูกต้อง');
+										error_log = error_log + 1;
 									}
 
 								}
 							}
 							else if (debt_project == "โครงการคุณสู้ เราช่วย") {
-								// โครงการคุณสู้เราช่วย ไม่เป็น required
-								if (sheet_no_payment == "") {
-									//do nothing
-								} else {
+								try {
+									// โครงการคุณสู้เราช่วย ไม่เป็น required
 									var intValue = parseInt(sheet_no_payment, 10);
-									if (isNaN(intValue) || intValue < 0) {
-										add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "จำนวนงวดที่ชำระ (เดือน)" ไม่ถูกต้อง');
-										error_log = error_log + 1;
+									if (sheet_no_payment == "" || intValue == 0) {
+										//do nothing
 									} else {
-										casetaskGr.u_installment = parseInt(sheet_no_payment);
+										if (isNaN(intValue) || intValue < 0) {
+											add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "จำนวนงวดที่ชำระ (เดือน)" ไม่ถูกต้อง');
+											error_log = error_log + 1;
+										} else {
+											casetaskGr.u_installment = parseInt(sheet_no_payment);
+										}
 									}
+								} catch (e) {
+									add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "จำนวนงวดที่ชำระ (เดือน)" ไม่ถูกต้อง');
+									error_log = error_log + 1;
 								}
 							}
 						}
@@ -1391,10 +1454,10 @@
 							// ใส่ค่าได้ทั้งโครงการทางด่วนแก้หนี้ และ โครงการคุณสู้ เราช่วย
 							if (check_money_valid(sheet_monthly) && value_sheet_monthly > 0) {
 								casetaskGr.u_amount_month = set_money_object(sheet_monthly);
-							} 
+							}
 							// log error
 							else if (debt_project == "ทางด่วนแก้หนี้") {
-								if (sheet_monthly == "" && (sheet_state == "New" || sheet_state == "Cancelled")) {
+								if (sheet_monthly == "" && (sheet_state == "New" || sheet_state == "Cancelled" || sheet_state == "Awaiting Info")) {
 									//do nothing
 								}
 								else if (sheet_monthly == "") {
@@ -1409,12 +1472,16 @@
 									add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "ค่างวดต่อเดือน (บาท)" ไม่ถูกต้อง');
 									error_log = error_log + 1;
 								}
-							} 
+							}
 							// log error
 							else if (debt_project == "โครงการคุณสู้ เราช่วย") {
-								if (sheet_monthly == "" || sheet_monthly == "0") {
+								if (sheet_monthly == "" || value_sheet_monthly == 0) {
 									//do nothing
-								} 
+								}
+								else if (value_sheet_monthly < 0) {
+									add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "ค่างวดต่อเดือน (บาท)" ต้องมากกว่า 0');
+									error_log = error_log + 1;
+								}
 								else {
 									add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "ค่างวดต่อเดือน (บาท)" ไม่ถูกต้อง');
 									error_log = error_log + 1;
@@ -1424,26 +1491,29 @@
 						}
 
 						// รายงาน RDT
-						if (sheet_rdt_report == "" || check_date_valid(sheet_rdt_report)) {
-							if (check_date_valid(sheet_rdt_report)){
-								casetaskGr.u_rdt = set_date_object(sheet_rdt_report);
+						if (sheet_rdt_report) {
+							if (sheet_rdt_report == "" || check_date_valid(sheet_rdt_report)) {
+								if (check_date_valid(sheet_rdt_report)) {
+									casetaskGr.u_rdt = set_date_object(sheet_rdt_report);
+								}
+							} else {
+								add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "รายงาน RDT" ไม่ถูกต้อง โปรดระบุใน format DD-MM-YYYY');
+								error_log = error_log + 1;
 							}
-						} else {
-							add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "รายงาน RDT" ไม่ถูกต้อง โปรดระบุใน format DD-MM-YYYY');
-							error_log = error_log + 1;
 						}
 
 
 						// รายงาน DRD
-						if (sheet_drd_report == "" || check_date_valid(sheet_drd_report)) {
-							if (check_date_valid(sheet_drd_report)){
-								casetaskGr.u_drd = set_date_object(sheet_drd_report);
+						if (sheet_drd_report) {
+							if (sheet_drd_report == "" || check_date_valid(sheet_drd_report)) {
+								if (check_date_valid(sheet_drd_report)) {
+									casetaskGr.u_drd = set_date_object(sheet_drd_report);
+								}
+							} else {
+								add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "วันที่ทำสัญญา" ไม่ถูกต้อง โปรดระบุใน format DD-MM-YYYY');
+								error_log = error_log + 1;
 							}
-						} else {
-							add_log(source.sys_import_set, row_count, target_record, "Error", 'รูปแบบข้อมูล "วันที่ทำสัญญา" ไม่ถูกต้อง โปรดระบุใน format DD-MM-YYYY');
-							error_log = error_log + 1;
 						}
-
 
 						// ข้อมูลที่ต้องการแจ้ง ธปท. เพิ่มเติม (ถ้ามี)
 						casetaskGr.u_other_informantion = sheet_additional_info;
@@ -1460,8 +1530,8 @@
 								var parentNumber = grd.parent.number.toString();
 							}
 
-							gs.info('parent' + parent);
-							gs.info('parentNumber' + parentNumber);
+							gs.info('[Excel Bulk Upload][DEB][Insert]parent' + parent);
+							gs.info('[Excel Bulk Upload][DEB][Insert]parentNumber' + parentNumber);
 
 
 							var gr = new GlideRecord('x_baot_debt_sett_0_ect_debt_settlement');
@@ -1472,7 +1542,7 @@
 
 							var type = 'casetask';
 							var recordNumber = new global.MF_ChildRecordNumberPadding().padNumber(rowCountNumber, parentNumber, type);
-							gs.info('recordNumber' + recordNumber);
+							gs.info('[Excel Bulk Upload][DEB][Insert]recordNumber' + recordNumber);
 
 							casetaskGr.number = recordNumber;
 							casetaskGr.insert();
@@ -1526,17 +1596,13 @@
 
 
 			row_table_importattachment.setValue("importset_link", source.sys_import_set);
-			// gs.info("row_table_importattachment : " + row_table_importattachment);
 			gs.info("[Excel Bulk Upload]: log_total" + log_total + " log_error_total:" + log_error_total);
 			if (log_total == log_error_total) {
-				// row_table_importattachment.setValue("state", "5"); // Error == 5
-				gs.info("[Excel Bulk Upload state]: Error");
+				gs.info("[Excel Bulk Upload][state]: Error = 5");
 			} else if (log_error_total == 0) {
-				// row_table_importattachment.setValue("state", "3"); // Completed == 3
-				gs.info("[Excel Bulk Upload state]: Completed");
+				gs.info("[Excel Bulk Upload][state]: Completed = 3");
 			} else {
-				// row_table_importattachment.setValue("state", "4"); // Completed with error == 4
-				gs.info("[Excel Bulk Upload state]: Completed with error");
+				gs.info("[Excel Bulk Upload][state]: Completed with error = 4");
 			}
 			var now_time = new GlideDateTime();
 			var last_time = new GlideDateTime(row_table_importattachment.sys_created_on);
@@ -1557,10 +1623,10 @@
 		if (error_log_all != 0) {
 			error = 1;
 		}
-		gs.info("[Excel Bulk Upload Transform] Complete ");
+		gs.info("[Excel Bulk Upload][Transform] Complete ");
 	} catch (error) {
 
-		gs.info("[Excel Bulk Upload Error catch] error: " + error);
+		gs.info("[Excel Bulk Upload][Error catch] error: " + error);
 
 
 		// Update Import Set in Table Import Attachment
@@ -1570,10 +1636,9 @@
 		row_table_importattachment.query();
 		if (row_table_importattachment.next()) {
 
-			//gs.info("[Excel Bulk Upload] Import Set add(sys_import_set): " + import_set.sys_id + " | " + row_importset.sys_id);
 			row_table_importattachment.setValue("importset_link", source.sys_import_set);
 			row_table_importattachment.setValue("state", "5");
-			gs.info("row_table_importattachment.setValue(5)");
+			gs.info("[Excel Bulk Upload]row_table_importattachment.setValue(5)");
 
 			var now_time = new GlideDateTime();
 			var last_time = new GlideDateTime(row_table_importattachment.sys_created_on);
@@ -1584,7 +1649,7 @@
 			row_table_importattachment.update();
 
 		} else {
-			gs.info("[Excel Bulk Upload Error catch] Record row_table_importattachment not found!");
+			gs.info("[Excel Bulk Upload][Error catch] Record row_table_importattachment not found!");
 		}
 
 
@@ -1622,7 +1687,7 @@ function check_datetime_valid(date_input) {
 	if (!match2) {
 		return false;
 	}
-
+	
 	var day = parseInt(match2[1], 10);
 	var month = parseInt(match2[2], 10);
 	var year = parseInt(match2[3], 10);
@@ -1690,7 +1755,7 @@ function check_idcard_valid(id_number) {
 
 function set_money_object(money_input) {
 	var x = money_input.replace("฿", "");
-	var y = x.replace(",", "");
+	var y = x.replace(/,/g, "");
 	return "THB;" + y;
 }
 
@@ -1706,10 +1771,9 @@ function check_email_valid(email) {
 }
 
 function check_phone_valid(phoneNumber) {
-	gs.info('phoneNumber' + phoneNumber);
+	gs.info('[Excel Bulk Upload][validate]phoneNumber' + phoneNumber);
 	var regex = /^66\d{9}$/;
 	var text = String(phoneNumber).replace(" ", "");
-	gs.info('text' + text);
 	return regex.test(text);
 
 }
@@ -1720,7 +1784,6 @@ function check_number_valid(inputNumber) {
 }
 
 function check_select_valid_active(table_select, choice_col, choice_select) {
-	//gs.info('Select > ' + table_select + ' ' + choice_col + ' ' + choice_select);
 	var selectGr = new GlideRecord(table_select);
 	selectGr.addQuery(choice_col, choice_select);
 	selectGr.addQuery('u_active', true);
@@ -1734,10 +1797,8 @@ function check_select_valid_active(table_select, choice_col, choice_select) {
 }
 
 function check_select_valid_activePipe(table_select, enCodeQuery) {
-	//gs.info('Select > ' + table_select + ' ' + choice_col + ' ' + choice_select);
 	var selectGr = new GlideRecord(table_select);
 	selectGr.addEncodedQuery(enCodeQuery);
-	gs.info('Select > ' + table_select + ' ' + enCodeQuery);
 	selectGr.setLimit(1);
 	selectGr.query();
 	if (selectGr.next()) {
@@ -1767,7 +1828,6 @@ function check_select_valid_activePipe2(table_select, enCodeQuery, debtFair) {
 }
 
 function check_active(table_select, choice_select) {
-	//gs.info('Select > ' + table_select + ' ' + choice_col + ' ' + choice_select);
 	var selectGr = new GlideRecord(table_select);
 	selectGr.addQuery('u_name', choice_select);
 	selectGr.addQuery('u_active', true);
@@ -1914,7 +1974,6 @@ function get_active_result(choice_select) {
 }
 
 function check_user_valid_active(table_select, choice_col, choice_select) {
-	//gs.info('Select > ' + table_select + ' ' + choice_col + ' ' + choice_select);
 	var selectGr = new GlideRecord(table_select);
 	selectGr.addQuery(choice_col, choice_select);
 	// selectGr.addQuery('u_active', 'True');
@@ -2008,8 +2067,15 @@ function sleep(ms) {
 
 }
 
-function setNumber(moneyFiled){
-	var x = moneyFiled.replace("฿", "");
-	var y = x.replace(",", "");
-	return y;
+function setNumber(moneyFiled) {
+	if (moneyFiled) {
+		var x = moneyFiled.replace("฿", "");
+		//ใช้ replaceall 
+		var y = x.replace(/,/g, "");
+		return y;
+	}
+	else {
+		return "";
+	}
+
 }
