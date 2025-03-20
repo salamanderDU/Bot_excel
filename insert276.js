@@ -8,30 +8,27 @@ var parser = new sn_impex.GlideExcelParser();
 
 var lastrow = 0;
 var rowCount = 1;
-var limitRow = 3;
-var recordExcel = 0;
+var limitRow = 350;
+// var recordExcel = 0;
 
 var allRecordSysId = [];
 var notMatchNumber = [];
 var notMatchLog = [];
+var errorLog = [];
+var importSetrefcantFix = [];
 
 var grDebtTask = new GlideRecord("x_baot_debt_sett_0_ect_debt_settlement");
-grDebtTask.addEncodedQuery("sys_created_bySTARTSWITHbulk^state=1^u_resolution_code!=");
+grDebtTask.addEncodedQuery("sys_created_by=BulkUploadJob^u_glideline_debtISEMPTY^u_reason_unable_helpISEMPTY^u_resolution_codeIN100,200^state=1^assignment_group!=aeeedf8247f0d2101b2b4ed4116d4346^ORassignment_group=NULL");
 grDebtTask.orderBy('sys_created_on');
 // grDebtTask.orderBy('number');
 grDebtTask.setLimit(limitRow);
 grDebtTask.query();
 while (rowCount < limitRow) {
 
-    gs.info("[DEBUpdate]rowCount: " + rowCount);
     if (rowCount == 1) {
         grDebtTask.next();
         allRecordSysId.push(grDebtTask.sys_id.toString());
     }
-
-    gs.info("[DEBUpdate]SYSID: " + grDebtTask.sys_id.toString());
-
-
 
     text_log += "\n" + grDebtTask.number + " " + grDebtTask.sys_created_on;
     detNumber = grDebtTask.number;
@@ -68,11 +65,13 @@ while (rowCount < limitRow) {
             var rowExcel = parser.getRow();
 
             if (grDebtTask.number == grImportLog.target_record) {
-                gs.info("[DEBUpdate]cursor: " + cursor);
-                gs.info("logLastRow: " + logGetLastRow(importSetRef) + " excelRow: " + recordExcel);
-                if ((logGetLastRow(importSetRef) == recordExcel) && (grDebtTask.u_number_contact == rowExcel["เลขที่บัตร/ เลขที่สัญญา"]) && (grDebtTask.u_iden_number == rowExcel["เลขที่ยืนยันตัวตน"])) {
-
+                // gs.info("[DEBUpdate]cursor: " + cursor);
+                // gs.info("logLastRow: " + logGetLastRow(importSetRef) + " excelRow: " + recordExcel);
+                // if ((logGetLastRow(importSetRef) == recordExcel) && (grDebtTask.u_number_contact == rowExcel["เลขที่บัตร/ เลขที่สัญญา"]) && (grDebtTask.u_iden_number == rowExcel["เลขที่ยืนยันตัวตน"])) {
+                if ((grDebtTask.u_number_contact == rowExcel["เลขที่บัตร/ เลขที่สัญญา"]) && (grDebtTask.u_iden_number == rowExcel["เลขที่ยืนยันตัวตน"])) {
+					// gs.info("ผลการพิจารณา: "+rowExcel["ผลการพิจารณา"]);
                     if (rowExcel["ผลการพิจารณา"]) {
+						var error_log = 0;
                         var simPercent = 40;
                         if (compareStrings(grDebtTask.u_provider.getDisplayValue(), rowExcel["ผู้ให้บริการ"]), simPercent) {
 
@@ -81,16 +80,16 @@ while (rowCount < limitRow) {
                             var debt_project = grDebtTask.u_debt_project.getDisplayValue();
                             var sheet_guidelines_debtors = rowExcel["แนวทางการช่วยเหลือลูกหนี้"];
 							var sheet_reason_not_help = rowExcel["เหตุผลที่ไม่สามารถช่วยเหลือลูกหนี้ได้"];
-							var error_log = 0;
+							
 
                             if (rowExcel["แนวทางการช่วยเหลือลูกหนี้"]) {
-                                sheet_guidelines_debtors.split("|")[0].trim();
+                                sheet_guidelines_debtors = sheet_guidelines_debtors.split("|")[0].trim();
                             } else {
                                 sheet_guidelines_debtors = "";
                             }
 
                             if (rowExcel["เหตุผลที่ไม่สามารถช่วยเหลือลูกหนี้ได้"]) {
-                                sheet_reason_not_help.split("|")[0].trim();
+                                sheet_reason_not_help = sheet_reason_not_help.split("|")[0].trim();
                             } else {
                                 sheet_reason_not_help = "";
                             }
@@ -100,18 +99,19 @@ while (rowCount < limitRow) {
                                 if (check_select_valid_activePipe2('u_glideline_debtor', "u_name=" + sheet_guidelines_debtors, debt_project)) {
                                     var glideline_debt = get_select_valid_active_check_fair('u_glideline_debtor', 'u_name', sheet_guidelines_debtors, debt_project);
                                     if (glideline_debt == "Error") {
-                                        add_log('รูปแบบข้อมูล "แนวทางการช่วยเหลือลูกหนี้" ไม่ถูกต้อง' + sheet_guidelines_debtors);
+                                        add_log(grDebtTask.number+ " "+grDebtTask.sys_id+" "+'รูปแบบข้อมูล "แนวทางการช่วยเหลือลูกหนี้" ไม่ถูกต้อง' + sheet_guidelines_debtors);
                                         error_log = error_log + 1;
                                     } else {
-                                        gs.info(grDebtTask.number + " [Update] แนวทางการช่วยเหลือลูกหนี้ => [" + glideline + "] " + glideline_debt);
-                                        // grDebtTask.u_glideline_debt = glideline_debt;
+										
+                                        gs.info(grDebtTask.number + " [Update] แนวทางการช่วยเหลือลูกหนี้ => [" + glideline_debt + "] ");
+                                        grDebtTask.u_glideline_debt = glideline_debt;
                                         // grDebtTask.update();
                                     }
                                 } else if (sheet_guidelines_debtors == "") {
-                                    add_log('โปรดระบุ "แนวทางการช่วยเหลือลูกหนี้"' + sheet_guidelines_debtors);
+                                    add_log(grDebtTask.number+ " "+grDebtTask.sys_id+" "+'โปรดระบุ "แนวทางการช่วยเหลือลูกหนี้"' + sheet_guidelines_debtors);
                                     error_log = error_log + 1;
                                 } else {
-                                    add_log('โปรดระบุ "แนวทางการช่วยเหลือลูกหนี้" ให้ถูกต้องตามโครงการ' + sheet_guidelines_debtors);
+                                    add_log(grDebtTask.number+ " "+grDebtTask.sys_id+" "+'โปรดระบุ "แนวทางการช่วยเหลือลูกหนี้" ให้ถูกต้องตามโครงการ' + sheet_guidelines_debtors);
                                     error_log = error_log + 1;
                                 }
                             }
@@ -122,35 +122,52 @@ while (rowCount < limitRow) {
                                 if (check_select_valid_activePipe2('u_unable_help', "u_name=" + sheet_reason_not_help, debt_project)) {
                                     var reason_unable_help = get_select_valid_active_check_fair('u_unable_help', 'u_name', sheet_reason_not_help, debt_project);
                                     if (reason_unable_help == "Error") {
-                                        add_log('รูปแบบข้อมูล "เหตุผลที่ไม่สามารถช่วยเหลือลูกหนี้ได้" ไม่ถูกต้อง');
+                                        add_log(grDebtTask.number+ " "+grDebtTask.sys_id+" "+'รูปแบบข้อมูล "เหตุผลที่ไม่สามารถช่วยเหลือลูกหนี้ได้" ไม่ถูกต้อง');
                                         error_log = error_log + 1;
                                     } else {
-                                        gs.info(grDebtTask.number + " [Update] เหตุผลที่ไม่สามารถช่วยเหลือลูกหนี้ได้ => [" + reason + "] " + reason_unable_help);
-                                        // grDebtTask.u_reason_unable_help = reason_unable_help;
+                                        gs.info(grDebtTask.number + " [Update] เหตุผลที่ไม่สามารถช่วยเหลือลูกหนี้ได้ => [" + reason_unable_help + "] " );
+                                        grDebtTask.u_reason_unable_help = reason_unable_help;
                                     }
                                 } else if (sheet_reason_not_help == "") {
-                                    add_log('โปรดระบุ "เหตุผลที่ไม่สามารถช่วยเหลือลูกหนี้ได้"');
+                                    add_log(grDebtTask.number+ " "+grDebtTask.sys_id+" "+'โปรดระบุ "เหตุผลที่ไม่สามารถช่วยเหลือลูกหนี้ได้"');
                                     error_log = error_log + 1;
                                 } else {
-                                    add_log('โปรดระบุ "เหตุผลที่ไม่สามารถช่วยเหลือลูกหนี้ได้" ให้ถูกต้องตามโครงการ');
+                                    add_log(grDebtTask.number+ " "+grDebtTask.sys_id+" "+'โปรดระบุ "เหตุผลที่ไม่สามารถช่วยเหลือลูกหนี้ได้" ให้ถูกต้องตามโครงการ');
                                     error_log = error_log + 1;
 
                                 }
                             }
+
+							//ข้อมูลที่ต้องการแจ้ง ธปท. เพิ่มเติม (ถ้ามี)
+							if((grDebtTask.close_notes == "") && (rowExcel["ข้อมูลที่ต้องการแจ้ง ธปท. เพิ่มเติม (ถ้ามี)"] != "")){
+								grDebtTask.close_notes = rowExcel["ข้อมูลที่ต้องการแจ้ง ธปท. เพิ่มเติม (ถ้ามี)"];
+                                gs.info("ข้อมูลที่ต้องการแจ้ง ธปท. เพิ่มเติม (ถ้ามี) => [" + rowExcel["ข้อมูลที่ต้องการแจ้ง ธปท. เพิ่มเติม (ถ้ามี)"] + "]");
+							}
+
+
                         } else {
-                            gs.info("[DEBUpdate][Error] ผู้ให้บริการไม่ตรงกัน Exce: " + rowExcel["ผู้ให้บริการ"] + " casetask: " + grDebtTask.u_provider.getDisplayValue());
+                            add_log(grDebtTask.number+ " "+grDebtTask.sys_id+" "+"ผู้ให้บริการไม่ตรงกัน Exce: " + rowExcel["ผู้ให้บริการ"] + " casetask: " + grDebtTask.u_provider.getDisplayValue());
 
                         }
+						
+						if(error_log == 0){
+							gs.info(grDebtTask.number+ " "+"update");
+						}else{
+							add_log(grDebtTask.number+ " "+grDebtTask.sys_id+" "+"มีข้อผิดพลาด "+error_log+" ข้อ");
+						}
+
                     } else {
-                        gs.info("[DEBEmpty][Empty] ไม่สามารถ แก้ไขได้เนื่องจากผลการพิจารณาเป็นค่าว่าง ");
+                        add_log(grDebtTask.number+ " "+grDebtTask.sys_id+" "+"โปรดระบุ ผลการพิจารณา");
                         notMatchNumber.push(grDebtTask.sys_id.toString());
                     }
                 } else {
                     gs.info("ข้อมูลไม่ตรง");
+					importSetrefcantFix.push(importSetRef.toString());
+					notMatchLog.push(grDebtTask.sys_id.toString());
                 }
                 gs.info(grImportLog.target_record + ' แถวที่ ' + row + " แนวทางกับเหตุผล คือ " + rowExcel["แนวทางการช่วยเหลือลูกหนี้"] + " " + rowExcel["เหตุผลที่ไม่สามารถช่วยเหลือลูกหนี้ได้"]);
-                gs.info(grImportLog.target_record + ' แถวที่ ' + row + " เลขที่ยืนยันตัวตน คือ " + rowExcel["เลขที่ยืนยันตัวตน"]);
-                gs.info(grImportLog.target_record + ' แถวที่ ' + row + " เลขที่บัตร/ เลขที่สัญญา คือ " + rowExcel["เลขที่บัตร/ เลขที่สัญญา"]);
+                // gs.info(grImportLog.target_record + ' แถวที่ ' + row + " เลขที่ยืนยันตัวตน คือ " + rowExcel["เลขที่ยืนยันตัวตน"]);
+                // gs.info(grImportLog.target_record + ' แถวที่ ' + row + " เลขที่บัตร/ เลขที่สัญญา คือ " + rowExcel["เลขที่บัตร/ เลขที่สัญญา"]);
 
 
                 if (grDebtTask.next()) {
@@ -177,8 +194,11 @@ while (rowCount < limitRow) {
 
 // log loop ของทั้งหมดของ case task ที่เราซ่อมไป 
 gs.info("[DEBUpdate]All record fix this script: " + allRecordSysId);
-gs.info("[DEBUpdate]All record can't fix this script: " + notMatchNumber);
-gs.info("[DEBUpdate]All record we skip: " + notMatchLog);
+importSetrefcantFix = unique(importSetrefcantFix);
+gs.info("[DEBUpdate]All Import set log wrong: " + unique(importSetrefcantFix));
+gs.info("[DEBUpdate]All record fix this script: " + notMatchLog);
+gs.info("[DEBUpdate]All record error log: " + errorLog);
+
 
 
 function createExcelParser(detNumber) {
@@ -213,20 +233,20 @@ function createExcelParser(detNumber) {
                 parser.setHeaderRowNumber(0);
                 parser.parse();
 
-                var attachmentRowCount = new GlideSysAttachment();
-                var attachmentStreamRowCount = attachment.getContentStream(grAtt.sys_id);
-                var parserRowCount = new sn_impex.GlideExcelParser();
-                parserRowCount.setSource(attachmentStreamRowCount);
-                parserRowCount.setHeaderRowNumber(0);
-                parserRowCount.parse();
-                var count = 1;
-                while (parserRowCount.next()) {
-                    count += 1;
-                }
-                parserRowCount.close();
+                // var attachmentRowCount = new GlideSysAttachment();
+                // var attachmentStreamRowCount = attachment.getContentStream(grAtt.sys_id);
+                // var parserRowCount = new sn_impex.GlideExcelParser();
+                // parserRowCount.setSource(attachmentStreamRowCount);
+                // parserRowCount.setHeaderRowNumber(0);
+                // parserRowCount.parse();
+                // var count = 1;
+                // while (parserRowCount.next()) {
+                //     count += 1;
+                // }
+                // parserRowCount.close();
 
-                recordExcel = count;
-                gs.info("[All excel count] = " + recordExcel);
+                // recordExcel = count;
+                // gs.info("[All excel count] = " + recordExcel);
 
 
             }
@@ -325,4 +345,25 @@ function check_select_valid_activePipe2(table_select, enCodeQuery, debtFair) {
 
 function add_log(msg){
 	gs.info(msg);
+	errorLog.push(msg);
+}
+
+function get_active_result(choice_select) {
+    var selectGr = new GlideRecord('sys_choice');
+    selectGr.addQuery('name', 'u_debt_settlement_master_case_task');
+    selectGr.addQuery('label', choice_select);
+    selectGr.addQuery('element', 'u_resolution_code');
+    selectGr.setLimit(1);
+    selectGr.query();
+    if (selectGr.next()) {
+        return selectGr.value;
+
+    } else {
+        return "Error";
+    }
+}
+
+function unique(a){
+    var a1 = a.filter((e, i, self) => i === self.indexOf(e));
+    return a1
 }
